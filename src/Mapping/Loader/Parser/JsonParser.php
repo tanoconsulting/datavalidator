@@ -17,7 +17,7 @@ class JsonParser implements ParserInterface
         /// @todo add json_last_error() info
 
         if (!is_array($data)) {
-            throw new \Exception("Invalid YAML config file: not an array");
+            throw new \Exception("Invalid JSON config file: not an array");
         }
 
         return $data;

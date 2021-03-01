@@ -82,7 +82,10 @@ class ValidateDatabaseCommand extends Command
             foreach($violations as $violation) {
                 $rows[] = [$violation->getConstraint()->getName(), $violation->getMessage()];
             }
+
         } elseif($input->getOption('display-data')) {
+            /// @todo improve output: display as well FK defs/sql query ?
+
             $validatorBuilder->setOperatingMode(DatabaseExecutionContext::MODE_FETCH);
             $tableHeaders = ['Constraint', 'Violation', 'Data'];
             /** @var \TanoConsulting\DataValidatorBundle\ConstraintViolation $violation */
@@ -97,6 +100,7 @@ class ValidateDatabaseCommand extends Command
                     $rows[] = [$violation->getConstraint()->getName(), 1, $violation->getMessage()];
                 }
             }
+
         } else {
             $tableHeaders = ['Constraint', 'Violations', 'Details'];
             /** @var \TanoConsulting\DataValidatorBundle\ConstraintViolation $violation */
