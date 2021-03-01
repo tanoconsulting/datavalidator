@@ -2,6 +2,7 @@
 
 namespace TanoConsulting\DataValidatorBundle;
 
+use eZ\Publish\API\Repository\Exceptions\Exception;
 use TanoConsulting\DataValidatorBundle\Context\DatabaseExecutionContextFactory;
 use TanoConsulting\DataValidatorBundle\Mapping\Factory\DatabaseMetadataFactory;
 use TanoConsulting\DataValidatorBundle\Mapping\Loader\LoaderChain;
@@ -33,6 +34,8 @@ class DatabaseValidatorBuilder extends ValidatorBuilder
                 $loader = new LoaderChain($loaders);
             } elseif (1 === \count($loaders)) {
                 $loader = $loaders[0];
+            } else {
+                throw new \Exception('At least one loader for configuration metadata is required');
             }
 
             $metadataFactory = new DatabaseMetadataFactory($loader);

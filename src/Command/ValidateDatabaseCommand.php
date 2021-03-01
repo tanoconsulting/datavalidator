@@ -27,11 +27,11 @@ class ValidateDatabaseCommand extends Command
         $this
             ->setDescription('Validates data in the database against a set of constraints')
             ->addOption('database', null, InputOption::VALUE_NONE, "The dsn of the database to connect to, eg: 'mysql://user:secret@localhost/mydb' or the doctrine connection name, eg, 'default'")
-            ->addOption('schema-file', null, InputOption::VALUE_REQUIRED, 'A yaml/json file defining the constraints to check')
+            ->addOption('config-file', null, InputOption::VALUE_REQUIRED, 'A yaml/json file defining the constraints to check')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Only display the list of constraints')
             ->addOption('display-data', null, InputOption::VALUE_NONE, 'Display the offending table rows, not only their count')
             /// @todo allow filtering...
-            //->addOption('omit-constraints', null, InputOption::VALUE_REQUIRED, 'A csv list of constraints not to check')
+            //->addOption('omit-coDatabaseValidatorBuildernstraints', null, InputOption::VALUE_REQUIRED, 'A csv list of constraints not to check')
             //->addOption('only-constraints', null, InputOption::VALUE_REQUIRED, 'A csv list of constraints to check')
         ;
     }
