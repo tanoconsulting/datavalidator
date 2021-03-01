@@ -28,10 +28,10 @@ class EzIniParser implements ParserInterface
                     $pieces = explode('::', $target);
                     $out[] = [
                         'ForeignKey' => [
-                            'from' => [
+                            'child' => [
                                 $name => explode(',', $pieces[0])
                             ],
-                            'to' => [
+                            'parent' => [
                                 $pieces[1] => explode(',', $pieces[2])
                             ],
                             'except' => (isset($pieces[3]) ? $pieces[3] : null)

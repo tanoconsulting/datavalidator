@@ -21,12 +21,24 @@ class QueryValidator extends ConstraintValidator
 
         switch($this->context->getOperatingMode()) {
             case ExecutionContextInterface::MODE_COUNT:
-                $violationCount = $connection->executeQuery('SELECT COUNT(*) AS rows FROM (' . rtrim($constraint->sql, ';') . ') subquery')->fetchOne();
-                $this->context->addViolation(new ConstraintViolation($constraint->sql, $violationCount, $constraint));
+                try {
+                    $violationCount = $connection->executeQuery('SELECT COUNT(*) AS numrows FROM (' . rtrim($constraint->sql, ';') . ') subquery')->fetchOne();
+                    if ($violationCount) {
+                        $this->context->addViolation(new ConstraintViolation($constraint->sql, $violationCount, $constraint));
+                    }
+                } catch (\Exception $e) {
+                    $this->context->addViolation(new ConstraintViolation(preg_replace('/\n */', ' ', $e->getMessage()), null, $constraint));
+                }
                 break;
             case ExecutionContextInterface::MODE_FETCH:
-                $violationData = $connection->executeQuery($constraint->sql)->fetchAllAssociative();
-                $this->context->addViolation(new ConstraintViolation($constraint->sql, $violationData, $constraint));
+                try {
+                    $violationData = $connection->executeQuery($constraint->sql)->fetchAllAssociative();
+                    if ($violationData) {
+                        $this->context->addViolation(new ConstraintViolation($constraint->sql, $violationData, $constraint));
+                    }
+                } catch (\Exception $e) {
+                    $this->context->addViolation(new ConstraintViolation(preg_replace('/\n */', ' ', $e->getMessage()), null, $constraint));
+                }
                 break;
             case ExecutionContextInterface::MODE_DRY_RUN:
                 $this->context->addViolation(new ConstraintViolation($constraint->sql, null, $constraint));

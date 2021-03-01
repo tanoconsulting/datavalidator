@@ -67,6 +67,9 @@ class ValidateDatabaseCommand extends Command
         }
 
         $validator = $validatorBuilder->getValidator();
+
+        /// @todo write an initial line: how many constraints are going to be checked
+
         /// @todo give signs of life during validation by writing something to stdout (stderr?)
         /// @todo catch ctrl-c and do a nice shutdown
         $violations = $validator->validate();
@@ -103,6 +106,8 @@ class ValidateDatabaseCommand extends Command
         $table->setRows($rows);
         $table->setColumnMaxWidth(3, 120);
         $table->render();
+
+        /// @todo print time taken and memory used
 
         // for dry run mode, the error is when there are no constraints defined...
         return (count($rows) xor $input->getOption('dry-run')) ? Command::FAILURE : Command::SUCCESS;

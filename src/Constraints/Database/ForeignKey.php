@@ -4,19 +4,22 @@ namespace TanoConsulting\DataValidatorBundle\Constraints\Database;
 
 use TanoConsulting\DataValidatorBundle\Constraints\DatabaseConstraint;
 
-/// @todo in constructor validate contents of from/to/except members
+/// @todo in constructor validate contents of members from/to/except
 class ForeignKey extends DatabaseConstraint
 {
-    static protected $defaultName = 'FK_';
+    static protected $defaultName = 'FOREIGN_KEY_';
 
-    public $from;
+    public $child;
 
-    public $to;
+    public $parent;
 
     public $except;
 
+    /**
+     * @return string[]
+     */
     public function getRequiredOptions()
     {
-        return ['from', 'to'];
+        return ['child', 'parent'];
     }
 }
