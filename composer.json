@@ -1,0 +1,35 @@
+{
+    "name": "tanoconsulting/datavalidator",
+    "type": "symfony-bundle",
+    "description": "A tool to validate Data stored in Databases and Filesystems",
+    "keywords": ["database", "constraint", "validation", "compliance"],
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Gaetano Giunta",
+            "email": "ggiunta@tanoconsulting.com",
+            "role": "Lead Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.3|^8.0",
+        "ext-json": "*",
+        "doctrine/dbal": "^2.11|^3.0",
+        "symfony/console": "^5.0.0",
+        "symfony/dependency-injection": "^5.0.0",
+        "symfony/yaml": "^5.0.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.5.12",
+        "symfony/validator": "^5.0.0"
+    },
+    "autoload": {
+        "psr-4": { "TanoConsulting\\DataValidatorBundle\\": "src" }
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/tanoconsulting"
+        }
+    ]
+}
