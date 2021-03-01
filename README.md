@@ -1,8 +1,6 @@
 DB Data Validator Bundle
 ========================
 
-*NB: Work In Progress*
-
 Goals:
 ------
 
@@ -28,21 +26,46 @@ rules can come in handy.
 Usage:
 ------
 
-1. define the set of constraints in a yaml or json file, eg:
+1. define the set of constraints in a yaml or json file. This sample shows the supported syntax:
 
     ```yaml
-    (to be defined...)
+    constraints:
+      -
+        ForeignKey:
+          child:
+            ezapprove_items: collaboration_id
+          parent:
+            ezcollab_item: id
+      -
+        ForeignKey:
+          child:
+            ezbinaryfile: [contentobject_attribute_id, version]
+          parent:
+            ezcontentobject_attribute: [id, version]
+       -
+        ForeignKey:
+          child:
+            ezcontentobject: id
+          parent:
+            ezcontentobject_version: contentobject_id
+          except: 'ezcontentobject.status = 1 AND ezcontentobject_version.status = 1'
+      -
+        Query:
+          name: classes_with_same_identifier
+          sql: 'SELECT identifier, COUNT(*) AS identical_identifiers FROM ezcontentclass WHERE version = 0 GROUP BY identifier HAVING COUNT(*) > 1'
     ```
 
 2. run the validation command
 
-        php bin/console datavalidator:validate:database --database ... --schema-file ...
+        php bin/console datavalidator:validate:database --database=... --schema-file=...
 
 Constraints currently supported:
 --------------------------------
 
 - foreign key definitions (WIP)
 - custom sql queries
+
+See the doc/samples folder for examples constraints of well-known applications' database schemas.
 
 Thanks
 ------
