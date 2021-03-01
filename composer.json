@@ -1,5 +1,5 @@
 {
-    "name": "tanoconsulting/datavalidator",
+    "name": "tanoconsulting/datavalidatorbundle",
     "type": "symfony-bundle",
     "description": "A tool to validate Data stored in Databases and Filesystems",
     "keywords": ["database", "constraint", "validation", "compliance"],
