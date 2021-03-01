@@ -2,6 +2,10 @@
 
 namespace TanoConsulting\DataValidatorBundle;
 
+use TanoConsulting\DataValidatorBundle\Exception\ConstraintDefinitionException;
+use TanoConsulting\DataValidatorBundle\Exception\InvalidOptionsException;
+use TanoConsulting\DataValidatorBundle\Exception\MissingOptionsException;
+
 /**
  * Contains the properties of a constraint definition.
  */
@@ -35,10 +39,8 @@ abstract class Constraint
      * @throws ConstraintDefinitionException When you don't pass an associative
      *                                       array, but getDefaultOption() returns
      *                                       null
-     *
-     * @todo Q: is it worth to go all the trouble with this dynamic constructor ?
      */
-    /*public function __construct($options = null /*, array $groups = null, $payload = null* /)
+    public function __construct($options = null /*, array $groups = null, $payload = null*/)
     {
         $options = $this->normalizeOptions($options);
         //if (null !== $groups) {
@@ -49,9 +51,9 @@ abstract class Constraint
         foreach ($options as $name => $value) {
             $this->$name = $value;
         }
-    }*/
+    }
 
-    /*protected function normalizeOptions($options): array
+    protected function normalizeOptions($options): array
     {
         $normalizedOptions = [];
         $defaultOption = $this->getDefaultOption();
@@ -105,7 +107,7 @@ abstract class Constraint
         }
 
         return $normalizedOptions;
-    }*/
+    }
 
     /**
      * Returns the name of the default option.
@@ -116,10 +118,10 @@ abstract class Constraint
      *
      * @see __construct()
      */
-    /*public function getDefaultOption()
+    public function getDefaultOption()
     {
         return null;
-    }*/
+    }
 
     /**
      * Returns the name of the required options.
@@ -130,10 +132,10 @@ abstract class Constraint
      *
      * @see __construct()
      */
-    /*public function getRequiredOptions()
+    public function getRequiredOptions()
     {
         return [];
-    }*/
+    }
 
     /**
      * Returns the name of the class that validates this constraint.

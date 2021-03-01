@@ -116,7 +116,7 @@ abstract class Metadata
      */
     public function addConstraint(Constraint $constraint)
     {
-        if ($constraint instanceof Traverse) {
+        /*if ($constraint instanceof Traverse) {
             throw new ConstraintDefinitionException(sprintf('The constraint "%s" can only be put on classes. Please use "Symfony\Component\Validator\Constraints\Valid" instead.', get_debug_type($constraint)));
         }
 
@@ -137,13 +137,13 @@ abstract class Metadata
 
             // The constraint is not added
             return $this;
-        }
+        }*/
 
         $this->constraints[] = $constraint;
 
-        foreach ($constraint->groups as $group) {
-            $this->constraintsByGroup[$group][] = $constraint;
-        }
+        //foreach ($constraint->groups as $group) {
+        //    $this->constraintsByGroup[$group][] = $constraint;
+        //}
 
         return $this;
     }

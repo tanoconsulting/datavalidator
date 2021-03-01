@@ -6,8 +6,5 @@ use TanoConsulting\DataValidatorBundle\Mapping\Loader\FileLoader as BaseFileLoad
 
 class FileLoader extends BaseFileLoader
 {
-    protected function createConstraint($constraintDefinition)
-    {
-
-    }
+    static $DEFAULT_NAMESPACE = '\\TanoConsulting\\DataValidatorBundle\\Constraints\\Database\\';
 }

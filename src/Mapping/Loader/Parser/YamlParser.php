@@ -1,13 +1,13 @@
 <?php
 
-
 namespace TanoConsulting\DataValidatorBundle\Mapping\Loader\Parser;
 
 use Symfony\Component\Yaml\Parser;
 
-class YamlParser
+class YamlParser implements ParserInterface
 {
     /**
+     * @see self::loadMetadata for the expected format
      * @param string $data
      * @return array
      * @throws \Exception

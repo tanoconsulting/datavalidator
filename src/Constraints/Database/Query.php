@@ -17,13 +17,13 @@ class Query extends DatabaseConstraint
      *
      * @param string|array $sql The pattern to evaluate or an array of options
      */
-    public function __construct(
+    /*public function __construct(
         string $sql,
         string $name = null
         /*string $message = null,
         array $groups = null,
         $payload = null,
-        array $options = []*/
+        array $options = []* /
     ) {
         $this->sql = $sql;
         $this->name = $name;
@@ -35,10 +35,10 @@ class Query extends DatabaseConstraint
 
         parent::__construct($options, $groups, $payload);
 
-        $this->message = $message ?? $this->message;*/
-    }
+        $this->message = $message ?? $this->message;* /
+    }*/
 
-    /*public function getDefaultOption()
+    public function getDefaultOption()
     {
         return 'sql';
     }
@@ -46,5 +46,5 @@ class Query extends DatabaseConstraint
     public function getRequiredOptions()
     {
         return ['sql'];
-    }*/
+    }
 }

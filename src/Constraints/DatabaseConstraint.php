@@ -9,12 +9,12 @@ abstract class DatabaseConstraint extends Constraint
     /**
      * Marks a constraint that can be put onto cross-table data.
      */
-    public const SCHEMA_CONSTRAINT = 'schema';
+    public const DATABASE_CONSTRAINT = 'database';
 
     /**
      * Marks a constraint that can be put onto table column data.
      */
-    //public const COLUMN_CONSTRAINT = 'column';
+    //public const DATABASE_COLUMN_CONSTRAINT = 'database_column';
 
     static protected $constraintsIndex = 1;
     static protected $defaultName = 'DB_CONSTRAINT_';
@@ -23,7 +23,7 @@ abstract class DatabaseConstraint extends Constraint
 
     public function getTargets()
     {
-        return self::SCHEMA_CONSTRAINT;
+        return self::DATABASE_CONSTRAINT;
     }
 
     public function getName()

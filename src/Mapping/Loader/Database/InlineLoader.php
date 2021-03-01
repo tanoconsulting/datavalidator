@@ -4,10 +4,7 @@ namespace TanoConsulting\DataValidatorBundle\Mapping\Loader\Database;
 
 use TanoConsulting\DataValidatorBundle\Mapping\Loader\InlineLoader as BaseInlineLoader;
 
-class InlineLoader
+class InlineLoader extends BaseInlineLoader
 {
-    protected function createConstraint($constraintDefinition)
-    {
-
-    }
+    static $DEFAULT_NAMESPACE = '\\TanoConsulting\\DataValidatorBundle\\Constraints\\Database\\';
 }

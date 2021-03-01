@@ -2,6 +2,7 @@
 
 namespace TanoConsulting\DataValidatorBundle\Mapping\Loader;
 
+use TanoConsulting\DataValidatorBundle\Exception\MappingException;
 use TanoConsulting\DataValidatorBundle\Mapping\Metadata;
 
 class LoaderChain implements LoaderInterface

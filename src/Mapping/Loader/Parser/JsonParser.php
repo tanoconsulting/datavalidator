@@ -2,9 +2,10 @@
 
 namespace TanoConsulting\DataValidatorBundle\Mapping\Loader\Parser;
 
-class JsonParser
+class JsonParser implements ParserInterface
 {
     /**
+     * @see self::loadMetadata for the expected format
      * @param string $data
      * @return array
      * @throws \Exception
