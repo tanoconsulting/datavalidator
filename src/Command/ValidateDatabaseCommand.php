@@ -88,8 +88,13 @@ class ValidateDatabaseCommand extends Command
             /** @var \TanoConsulting\DataValidatorBundle\ConstraintViolation $violation */
             foreach($violations as $violation) {
                 $data = $violation->getInvalidValue();
-                foreach ($data as $i => $value) {
-                    $rows[] = [$violation->getConstraint()->getName(), $i, preg_replace('/([\n\r] *)+/', ' ', json_encode($data))];
+                if (is_array($data)) {
+                    foreach ($data as $i => $value) {
+                        $rows[] = [$violation->getConstraint()->getName(), $i+1, preg_replace('/([\n\r] *)+/', ' ', json_encode($value))];
+                    }
+                } else {
+                    // exceptions and similar...
+                    $rows[] = [$violation->getConstraint()->getName(), 1, $violation->getMessage()];
                 }
             }
         } else {
