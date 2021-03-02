@@ -2,7 +2,7 @@
 
 namespace TanoConsulting\DataValidatorBundle;
 
-interface ConstraintViolationListInterface extends \Traversable, \Countable, \ArrayAccess
+interface ConstraintViolationListInterface extends \IteratorAggregate, \Countable, \ArrayAccess
 {
     /**
      * Adds a constraint violation to this list.

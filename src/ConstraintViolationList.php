@@ -2,7 +2,7 @@
 
 namespace TanoConsulting\DataValidatorBundle;
 
-class ConstraintViolationList implements ConstraintViolationListInterface, \IteratorAggregate
+class ConstraintViolationList implements ConstraintViolationListInterface
 {
     /**
      * @var ConstraintViolationInterface[]
