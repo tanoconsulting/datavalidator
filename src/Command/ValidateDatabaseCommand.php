@@ -31,7 +31,7 @@ class ValidateDatabaseCommand extends Command
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Only display the list of constraints')
             ->addOption('display-data', null, InputOption::VALUE_NONE, 'Display the offending table rows, not only their count')
             /// @todo allow filtering...
-            //->addOption('omit-coDatabaseValidatorBuildernstraints', null, InputOption::VALUE_REQUIRED, 'A csv list of constraints not to check')
+            //->addOption('omit-constraints', null, InputOption::VALUE_REQUIRED, 'A csv list of constraints not to check')
             //->addOption('only-constraints', null, InputOption::VALUE_REQUIRED, 'A csv list of constraints to check')
         ;
     }
@@ -44,6 +44,8 @@ class ValidateDatabaseCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $start = microtime(true);
+
         $validatorBuilder =  new DatabaseValidatorBuilder();
 
         /// @todo check that $this->container is set before using it
@@ -54,7 +56,6 @@ class ValidateDatabaseCommand extends Command
         } else {
             $connection = $this->container->get('doctrine.dbal.default_connection');
         }
-        $validatorBuilder->setConnection($connection);
 
         if ($configFile = $input->getOption('config-file')) {
             $validatorBuilder->addFileMapping($configFile);
@@ -70,13 +71,17 @@ class ValidateDatabaseCommand extends Command
 
         /// @todo write an initial line: how many constraints are going to be checked
 
+        if (function_exists('pcntl_signal'))
+        {
+            pcntl_signal(SIGTERM, [$validator, 'onStopSignal']);
+            pcntl_signal(SIGINT, [$validator, 'onStopSignal']);
+        }
+
         /// @todo give signs of life during validation by writing something to stdout (stderr?)
-        /// @todo catch ctrl-c and do a nice shutdown
-        $violations = $validator->validate();
+        $violations = $validator->validate($connection);
 
         $rows = [];
         if ($input->getOption('dry-run')) {
-            $validatorBuilder->setOperatingMode(DatabaseExecutionContext::MODE_DRY_RUN);
             $tableHeaders = ['Constraint', 'Details'];
             /** @var \TanoConsulting\DataValidatorBundle\ConstraintViolation $violation */
             foreach($violations as $violation) {
@@ -86,7 +91,6 @@ class ValidateDatabaseCommand extends Command
         } elseif($input->getOption('display-data')) {
             /// @todo improve output: display as well FK defs/sql query ?
 
-            $validatorBuilder->setOperatingMode(DatabaseExecutionContext::MODE_FETCH);
             $tableHeaders = ['Constraint', 'Violation', 'Data'];
             /** @var \TanoConsulting\DataValidatorBundle\ConstraintViolation $violation */
             foreach($violations as $violation) {
@@ -116,7 +120,11 @@ class ValidateDatabaseCommand extends Command
         $table->setColumnMaxWidth(3, 120);
         $table->render();
 
-        /// @todo print time taken and memory used
+        // print time taken and memory used
+        $time = microtime(true) - $start;
+        $output->writeln('Done.  Time taken: ' . sprintf('%.1f', $time) . ' secs, Max mem usage: ' .
+            memory_get_peak_usage(true) . ' bytes'
+        );
 
         // for dry run mode, the error is when there are no constraints defined...
         return (count($rows) xor $input->getOption('dry-run')) ? Command::FAILURE : Command::SUCCESS;

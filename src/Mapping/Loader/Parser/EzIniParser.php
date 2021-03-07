@@ -2,6 +2,8 @@
 
 namespace TanoConsulting\DataValidatorBundle\Mapping\Loader\Parser;
 
+use TanoConsulting\DataValidatorBundle\Exception\MappingException;
+
 class EzIniParser implements ParserInterface
 {
 
@@ -17,7 +19,7 @@ class EzIniParser implements ParserInterface
         $data = parse_ini_string(preg_replace('/^#/m', ';', $data), true, INI_SCANNER_RAW);
 
         if (!is_array($data)) {
-            throw new \Exception("Invalid Ini config file: not an array");
+            throw new MappingException('Invalid Ini config file: not an array');
         }
 
         $out = [];

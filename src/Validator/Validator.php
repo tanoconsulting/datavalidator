@@ -15,6 +15,8 @@ abstract class Validator implements ValidatorInterface
     /** @var ConstraintValidatorFactoryInterface */
     protected $validatorFactory;
 
+    protected $shouldStop = false;
+
     /**
      * @param $executionContextFactory
      * @param $metadataFactory
@@ -28,17 +30,31 @@ abstract class Validator implements ValidatorInterface
     }
 
     /**
+     * @param mixed $value The value to validate
      * @return \TanoConsulting\DataValidatorBundle\ConstraintViolationListInterface
      */
-    public function validate()
+    public function validate($value)
     {
         $context = $this->executionContextFactory->createContext($this);
         foreach($this->getConstraints() as $name => $constraint) {
-            $validator = $this->validatorFactory->getInstance($constraint);
-            $validator->initialize($context);
-            $validator->validate($constraint);
+            // allow exiting halfway through the loop
+            if (function_exists('pcntl_signal_dispatch')) {
+                pcntl_signal_dispatch();
+            }
+            if ( $this->shouldStop ) {
+                break;
+            }
+
+            $constraintValidator = $this->validatorFactory->getInstance($constraint);
+            $constraintValidator->initialize($context);
+            $constraintValidator->validate($value, $constraint);
         }
         return $context->getViolations();
+    }
+
+    public function onStopSignal()
+    {
+        $this->shouldStop = true;
     }
 
     protected function getConstraints()

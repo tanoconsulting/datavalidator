@@ -2,6 +2,6 @@
 
 namespace TanoConsulting\DataValidatorBundle\Exception;
 
-class ConstraintDefinitionException extends ValidatorException
+class ValidatorException extends \Exception
 {
 }

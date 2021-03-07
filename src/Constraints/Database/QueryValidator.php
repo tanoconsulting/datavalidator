@@ -4,20 +4,21 @@ namespace TanoConsulting\DataValidatorBundle\Constraints\Database;
 
 use Doctrine\DBAL\Connection;
 use TanoConsulting\DataValidatorBundle\Constraint;
-use TanoConsulting\DataValidatorBundle\ConstraintValidator;
+use TanoConsulting\DataValidatorBundle\Constraints\DatabaseValidator;
 use TanoConsulting\DataValidatorBundle\ConstraintViolation;
 use TanoConsulting\DataValidatorBundle\Context\ExecutionContextInterface;
 
-class QueryValidator extends ConstraintValidator
+class QueryValidator extends DatabaseValidator
 {
     /**
-     * @param Query $constraint
+     * @param string|Connection $value string format: 'mysql://user:secret@localhost/mydb'
+     * @param Constraint $constraint
      * @throws \Doctrine\DBAL\Exception
      */
-    public function validate(Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
         /** @var Connection $connection */
-        $connection = $this->context->getConnection();
+        $connection = $this->getConnection($value);
 
         switch($this->context->getOperatingMode()) {
             case ExecutionContextInterface::MODE_COUNT:

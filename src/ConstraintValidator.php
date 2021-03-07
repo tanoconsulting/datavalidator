@@ -25,7 +25,8 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     /**
      * Checks if the passed value is valid.
      *
+     * @param mixed $value
      * @param Constraint $constraint
      */
-    abstract public function validate(Constraint $constraint);
+    abstract public function validate($value, Constraint $constraint);
 }

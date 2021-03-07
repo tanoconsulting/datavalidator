@@ -111,8 +111,7 @@ abstract class Metadata
      *
      * @return $this
      *
-     * @throws ConstraintDefinitionException When trying to add the
-     *                                       {@link Traverse} constraint
+     * @throws ConstraintDefinitionException When trying to add the {@link Traverse} constraint
      */
     public function addConstraint(Constraint $constraint)
     {

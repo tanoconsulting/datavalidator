@@ -2,6 +2,7 @@
 
 namespace TanoConsulting\DataValidatorBundle;
 
+use Symfony\Component\Validator\Exception\ValidatorException;
 use TanoConsulting\DataValidatorBundle\Context\DatabaseExecutionContext;
 use TanoConsulting\DataValidatorBundle\Mapping\Factory\MetadataFactoryInterface;
 use TanoConsulting\DataValidatorBundle\Mapping\Loader\Database\FileLoader;
@@ -45,7 +46,7 @@ abstract class ValidatorBuilder
     public function setMetadataFactory(MetadataFactoryInterface $metadataFactory)
     {
         if (\count($this->getLoaders()) > 0) {
-            throw new \Exception('You cannot set a custom metadata factory after adding custom mappings. You should do either of both.');
+            throw new ValidatorException('You cannot set a custom metadata factory after adding custom mappings. You should do either of both.');
         }
 
         $this->metadataFactory = $metadataFactory;
@@ -63,7 +64,7 @@ abstract class ValidatorBuilder
     public function addFileMapping($path)
     {
         if (null !== $this->metadataFactory) {
-            throw new \Exception('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
+            throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
         }
 
         $this->fileMappings[] = $path;
@@ -81,7 +82,7 @@ abstract class ValidatorBuilder
     public function addFileMappings(array $paths)
     {
         if (null !== $this->metadataFactory) {
-            throw new \Exception('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
+            throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
         }
 
         $this->fileMappings = array_merge($this->fileMappings, $paths);

@@ -3,6 +3,7 @@
 namespace TanoConsulting\DataValidatorBundle;
 
 use eZ\Publish\API\Repository\Exceptions\Exception;
+use Symfony\Component\Validator\Exception\ValidatorException;
 use TanoConsulting\DataValidatorBundle\Context\DatabaseExecutionContextFactory;
 use TanoConsulting\DataValidatorBundle\Mapping\Factory\DatabaseMetadataFactory;
 use TanoConsulting\DataValidatorBundle\Mapping\Loader\LoaderChain;
@@ -10,13 +11,6 @@ use TanoConsulting\DataValidatorBundle\Validator\DatabaseValidator;
 
 class DatabaseValidatorBuilder extends ValidatorBuilder
 {
-    protected $dsnOrConnection;
-
-    public function setConnection($connection)
-    {
-        $this->dsnOrConnection = $connection;
-    }
-
     /**
      * Builds and returns a new db validator object.
      *
@@ -35,13 +29,13 @@ class DatabaseValidatorBuilder extends ValidatorBuilder
             } elseif (1 === \count($loaders)) {
                 $loader = $loaders[0];
             } else {
-                throw new \Exception('At least one loader for configuration metadata is required');
+                throw new ValidatorException('At least one loader for configuration metadata is required');
             }
 
             $metadataFactory = new DatabaseMetadataFactory($loader);
         }
 
-        $contextFactory = new DatabaseExecutionContextFactory($this->dsnOrConnection, $this->operatingMode);
+        $contextFactory = new DatabaseExecutionContextFactory($this->operatingMode);
 
         $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory();
 

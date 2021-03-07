@@ -2,6 +2,6 @@
 
 namespace TanoConsulting\DataValidatorBundle\Exception;
 
-class InvalidOptionsException extends \Exception
+class InvalidOptionsException extends ValidatorException
 {
 }

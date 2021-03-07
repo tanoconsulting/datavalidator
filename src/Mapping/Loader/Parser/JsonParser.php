@@ -2,6 +2,8 @@
 
 namespace TanoConsulting\DataValidatorBundle\Mapping\Loader\Parser;
 
+use TanoConsulting\DataValidatorBundle\Exception\MappingException;
+
 class JsonParser implements ParserInterface
 {
     /**
@@ -17,7 +19,7 @@ class JsonParser implements ParserInterface
         /// @todo add json_last_error() info
 
         if (!is_array($data)) {
-            throw new \Exception("Invalid JSON config file: not an array");
+            throw new MappingException('Invalid JSON config file: not an array');
         }
 
         return $data;

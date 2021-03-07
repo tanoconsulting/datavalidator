@@ -4,18 +4,23 @@ namespace TanoConsulting\DataValidatorBundle\Constraints\Database;
 
 use Doctrine\DBAL\Connection;
 use TanoConsulting\DataValidatorBundle\Constraint;
-use TanoConsulting\DataValidatorBundle\ConstraintValidator;
+use TanoConsulting\DataValidatorBundle\Constraints\DatabaseValidator;
 use TanoConsulting\DataValidatorBundle\ConstraintViolation;
 use TanoConsulting\DataValidatorBundle\Context\ExecutionContextInterface;
 
-class ForeignKeyValidator extends ConstraintValidator
+class ForeignKeyValidator extends DatabaseValidator
 {
     protected static $tables;
 
-    public function validate(Constraint $constraint)
+    /**
+     * @param string|Connection $value string format: 'mysql://user:secret@localhost/mydb'
+     * @param Constraint $constraint
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    public function validate($value, Constraint $constraint)
     {
         /** @var Connection $connection */
-        $connection = $this->context->getConnection();
+        $connection = $this->getConnection($value);
 
         /// @todo add verification of FK cols defs matching...
 

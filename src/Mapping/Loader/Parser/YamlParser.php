@@ -3,6 +3,7 @@
 namespace TanoConsulting\DataValidatorBundle\Mapping\Loader\Parser;
 
 use Symfony\Component\Yaml\Parser;
+use TanoConsulting\DataValidatorBundle\Exception\MappingException;
 
 class YamlParser implements ParserInterface
 {
@@ -18,7 +19,7 @@ class YamlParser implements ParserInterface
         $data = $parser->parse($data);
 
         if (!is_array($data)) {
-            throw new \Exception("Invalid YAML config file: not an array");
+            throw new MappingException('Invalid YAML config file: not an array');
         }
 
         return $data;
