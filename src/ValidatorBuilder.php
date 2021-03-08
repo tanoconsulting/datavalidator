@@ -2,8 +2,10 @@
 
 namespace TanoConsulting\DataValidatorBundle;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use TanoConsulting\DataValidatorBundle\Context\DatabaseExecutionContext;
+use TanoConsulting\DataValidatorBundle\Context\ExecutionContextFactoryInterface;
 use TanoConsulting\DataValidatorBundle\Mapping\Factory\MetadataFactoryInterface;
 use TanoConsulting\DataValidatorBundle\Mapping\Loader\Database\FileLoader;
 use TanoConsulting\DataValidatorBundle\Mapping\Loader\LoaderInterface;
@@ -24,7 +26,12 @@ abstract class ValidatorBuilder
 
     protected $fileMappings = [];
 
+    /** @var ExecutionContextFactoryInterface|null */
+    protected $executionContextFactory;
+
     protected $operatingMode = DatabaseExecutionContext::MODE_COUNT;
+
+    protected $eventDispatcher;
 
     /**
      * Sets the constraint validator factory used by the validator.
@@ -113,7 +120,17 @@ abstract class ValidatorBuilder
         return array_merge($loaders, $this->loaders);
     }
 
-    public function setOperatingMode($mode) {
+    public function setOperatingMode($mode)
+    {
+        if (null !== $this->executionContextFactory) {
+            throw new ValidatorException('You cannot set a custom operating mode after setting a custom context factory. Configure your context factory instead.');
+        }
+
         $this->operatingMode = $mode;
+    }
+
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 }

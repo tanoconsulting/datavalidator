@@ -6,6 +6,10 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
     protected $validators = [];
 
+    /**
+     * @param Constraint $constraint
+     * @return ConstraintValidatorInterface
+     */
     public function getInstance(Constraint $constraint)
     {
         /// @todo throw on unsupported constraints

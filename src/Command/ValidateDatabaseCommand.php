@@ -2,24 +2,28 @@
 
 namespace TanoConsulting\DataValidatorBundle\Command;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use TanoConsulting\DataValidatorBundle\Context\DatabaseExecutionContext;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use TanoConsulting\DataValidatorBundle\Context\ExecutionContextInterface;
 use TanoConsulting\DataValidatorBundle\DatabaseValidatorBuilder;
+use TanoConsulting\DataValidatorBundle\Logger\ConsoleLogger;
 
-class ValidateDatabaseCommand extends Command
+class ValidateDatabaseCommand extends ValidateCommand
 {
     protected static $defaultName = 'datavalidator:validate:database';
     protected $container;
 
-    public function __construct(ContainerInterface $container = null)
+    public function __construct(EventDispatcherInterface $eventDispatcher = null, LoggerInterface $datavalidatorLogger = null,
+        ContainerInterface $container = null)
     {
         $this->container = $container;
-        parent::__construct();
+        parent::__construct($eventDispatcher, $datavalidatorLogger);
     }
 
     protected function configure()
@@ -46,7 +50,8 @@ class ValidateDatabaseCommand extends Command
     {
         $start = microtime(true);
 
-        $validatorBuilder =  new DatabaseValidatorBuilder();
+        /// @todo get a standard logger injected via the constructor, push it into the ConsoleLogger
+        $this->setLogger(new ConsoleLogger($output));
 
         /// @todo check that $this->container is set before using it
         if ($connection = $input->getOption('database')) {
@@ -57,19 +62,24 @@ class ValidateDatabaseCommand extends Command
             $connection = $this->container->get('doctrine.dbal.default_connection');
         }
 
+        $validatorBuilder = new DatabaseValidatorBuilder();
+
         if ($configFile = $input->getOption('config-file')) {
             $validatorBuilder->addFileMapping($configFile);
         }
 
+        $validatorBuilder->setEventDispatcher($this->eventDispatcher);
+
         if ($input->getOption('dry-run')) {
-            $validatorBuilder->setOperatingMode(DatabaseExecutionContext::MODE_DRY_RUN);
+            $validatorBuilder->setOperatingMode(ExecutionContextInterface::MODE_DRY_RUN);
+            $this->echoConstraintExecution = false;
         } elseif($input->getOption('display-data')) {
-            $validatorBuilder->setOperatingMode(DatabaseExecutionContext::MODE_FETCH);
+            $validatorBuilder->setOperatingMode(ExecutionContextInterface::MODE_FETCH);
         }
 
         $validator = $validatorBuilder->getValidator();
 
-        /// @todo write an initial line: how many constraints are going to be checked
+        $this->logger->notice('Found ' . count($validator->getConstraints()) . ' constraints to validate...');
 
         if (function_exists('pcntl_signal'))
         {
@@ -122,7 +132,7 @@ class ValidateDatabaseCommand extends Command
 
         // print time taken and memory used
         $time = microtime(true) - $start;
-        $output->writeln('Done.  Time taken: ' . sprintf('%.1f', $time) . ' secs, Max mem usage: ' .
+        $this->logger->notice('Done.  Time taken: ' . sprintf('%.1f', $time) . ' secs, Max mem usage: ' .
             memory_get_peak_usage(true) . ' bytes'
         );
 

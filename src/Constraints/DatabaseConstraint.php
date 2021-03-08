@@ -26,12 +26,17 @@ abstract class DatabaseConstraint extends Constraint
         return self::DATABASE_CONSTRAINT;
     }
 
-    public function getName()
+    public function __construct($options = null /*, array $groups = null, $payload = null*/)
     {
+        parent::__construct($options);
         if ($this->name === null) {
             $this->name = static::$defaultName . static::$constraintsIndex;
             self::$constraintsIndex++;
         }
+    }
+
+    public function getName()
+    {
         return $this->name;
     }
 }

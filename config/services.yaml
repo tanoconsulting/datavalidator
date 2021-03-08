@@ -5,3 +5,7 @@ services:
 
     TanoConsulting\DataValidatorBundle\Command\:
         resource: '../src/Command'
+
+    TanoConsulting\DataValidatorBundle\Command\ValidateDatabaseCommand:
+        tags:
+            - { name: kernel.event_listener, event: before.constraint.validation, method: onBeforeConstraintValidation }

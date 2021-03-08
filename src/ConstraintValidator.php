@@ -15,8 +15,8 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     public function initialize(ExecutionContextInterface $context)
     {
-        //if (! $context instanceof \TanoConsulting\DataValidatorBundle\Context\DatabaseExecutionContext) {
-        //    throw new \TypeError(self::class . ' validators can only use a DatabaseExecutionContext');
+        //if (! $context instanceof \TanoConsulting\DataValidatorBundle\Context\ExecutionContext) {
+        //    throw new \TypeError(self::class . ' validators can only use a DataValidatorBundle ExecutionContext');
         //}
 
         $this->context = $context;

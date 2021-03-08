@@ -29,7 +29,7 @@ class ForeignKeyValidator extends DatabaseValidator
                 // skip check if either table does not exist
                 if (!$this->tablesExist($constraint, $connection))
                 {
-                    /// @todo emit a warning (or a violation?)
+                    /// @todo emit a warning
                     return;
                 }
                 try {
@@ -46,7 +46,7 @@ class ForeignKeyValidator extends DatabaseValidator
                 // skip check if either table does not exist
                 if (!$this->tablesExist($constraint, $connection))
                 {
-                    /// @todo emit a warning (or a violation?)
+                    /// @todo emit a warning
                     return;
                 }
                 try {

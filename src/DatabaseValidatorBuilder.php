@@ -2,7 +2,6 @@
 
 namespace TanoConsulting\DataValidatorBundle;
 
-use eZ\Publish\API\Repository\Exceptions\Exception;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use TanoConsulting\DataValidatorBundle\Context\DatabaseExecutionContextFactory;
 use TanoConsulting\DataValidatorBundle\Mapping\Factory\DatabaseMetadataFactory;
@@ -18,11 +17,11 @@ class DatabaseValidatorBuilder extends ValidatorBuilder
      */
     public function getValidator()
     {
-        $metadataFactory = $this->metadataFactory;
+        $contextFactory = $this->executionContextFactory ?:new DatabaseExecutionContextFactory($this->operatingMode);
 
+        $metadataFactory = $this->metadataFactory;
         if (!$metadataFactory) {
             $loaders = $this->getLoaders();
-            $loader = null;
 
             if (\count($loaders) > 1) {
                 $loader = new LoaderChain($loaders);
@@ -35,10 +34,10 @@ class DatabaseValidatorBuilder extends ValidatorBuilder
             $metadataFactory = new DatabaseMetadataFactory($loader);
         }
 
-        $contextFactory = new DatabaseExecutionContextFactory($this->operatingMode);
-
         $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory();
 
-        return new DatabaseValidator($contextFactory, $metadataFactory, $validatorFactory);
+        $eventDispatcher = $this->eventDispatcher;
+
+        return new DatabaseValidator($contextFactory, $metadataFactory, $validatorFactory, $eventDispatcher);
     }
 }

@@ -5,6 +5,8 @@ namespace TanoConsulting\DataValidatorBundle\Validator;
 use TanoConsulting\DataValidatorBundle\ConstraintValidatorFactoryInterface;
 use TanoConsulting\DataValidatorBundle\Context\ExecutionContextFactoryInterface;
 use TanoConsulting\DataValidatorBundle\Mapping\Factory\MetadataFactoryInterface;
+use TanoConsulting\DataValidatorBundle\Event\BeforeConstraintValidatedEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 abstract class Validator implements ValidatorInterface
 {
@@ -14,6 +16,8 @@ abstract class Validator implements ValidatorInterface
     protected $metadataFactory;
     /** @var ConstraintValidatorFactoryInterface */
     protected $validatorFactory;
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
 
     protected $shouldStop = false;
 
@@ -21,12 +25,14 @@ abstract class Validator implements ValidatorInterface
      * @param $executionContextFactory
      * @param $metadataFactory
      * @param $validatorFactory
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct($executionContextFactory, $metadataFactory, $validatorFactory)
+    public function __construct($executionContextFactory, $metadataFactory, $validatorFactory, $eventDispatcher = null)
     {
         $this->executionContextFactory = $executionContextFactory;
         $this->metadataFactory = $metadataFactory;
         $this->validatorFactory = $validatorFactory;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -45,9 +51,20 @@ abstract class Validator implements ValidatorInterface
                 break;
             }
 
+            if ($this->eventDispatcher) {
+                $event = new BeforeConstraintValidatedEvent($constraint);
+                $this->eventDispatcher->dispatch($event, BeforeConstraintValidatedEvent::NAME);
+
+                if ($event->isValidationCancelled()) {
+                    continue;
+                }
+            }
+
             $constraintValidator = $this->validatorFactory->getInstance($constraint);
             $constraintValidator->initialize($context);
             $constraintValidator->validate($value, $constraint);
+
+            /// @todo emit an 'after' validation event, allowing to recap the total constraints validated plus time taken
         }
         return $context->getViolations();
     }
@@ -57,7 +74,7 @@ abstract class Validator implements ValidatorInterface
         $this->shouldStop = true;
     }
 
-    protected function getConstraints()
+    public function getConstraints()
     {
         return $this->metadataFactory->getMetadata()->getConstraints();
     }
