@@ -33,7 +33,7 @@ Requirements:
 Usage:
 ------
 
-1. the set of constraints can be defined in a yaml or json file. This sample shows the supported syntax:
+1. the set of constraints can be defined in a yaml or json file. This sample shows the supported syntax, using yaml:
 
     ```yaml
     constraints:
