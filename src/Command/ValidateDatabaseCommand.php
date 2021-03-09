@@ -13,16 +13,20 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use TanoConsulting\DataValidatorBundle\Context\ExecutionContextInterface;
 use TanoConsulting\DataValidatorBundle\DatabaseValidatorBuilder;
 use TanoConsulting\DataValidatorBundle\Logger\ConsoleLogger;
+use TanoConsulting\DataValidatorBundle\Mapping\Loader\Database\TaggedServiceLoader;
 
 class ValidateDatabaseCommand extends ValidateCommand
 {
     protected static $defaultName = 'datavalidator:validate:database';
     protected $container;
+    protected $taggedServicesLoader;
 
     public function __construct(EventDispatcherInterface $eventDispatcher = null, LoggerInterface $datavalidatorLogger = null,
-        ContainerInterface $container = null)
+        ContainerInterface $container = null, TaggedServiceLoader $taggedServicesLoader = null)
     {
         $this->container = $container;
+        $this->taggedServicesLoader = $taggedServicesLoader;
+
         parent::__construct($eventDispatcher, $datavalidatorLogger);
     }
 
@@ -31,7 +35,7 @@ class ValidateDatabaseCommand extends ValidateCommand
         $this
             ->setDescription('Validates data in the database against a set of constraints')
             ->addOption('database', null, InputOption::VALUE_NONE, "The dsn of the database to connect to, eg: 'mysql://user:secret@localhost/mydb' or the doctrine connection name, eg, 'default'")
-            ->addOption('config-file', null, InputOption::VALUE_REQUIRED, 'A yaml/json file defining the constraints to check')
+            ->addOption('config-file', null, InputOption::VALUE_REQUIRED, 'A yaml/json file defining the constraints to check. If omitted: load them from config/services')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Only display the list of constraints')
             ->addOption('display-data', null, InputOption::VALUE_NONE, 'Display the offending table rows, not only their count')
             /// @todo allow filtering...
@@ -66,6 +70,8 @@ class ValidateDatabaseCommand extends ValidateCommand
 
         if ($configFile = $input->getOption('config-file')) {
             $validatorBuilder->addFileMapping($configFile);
+        } else {
+            $validatorBuilder->addLoader($this->taggedServicesLoader);
         }
 
         $validatorBuilder->setEventDispatcher($this->eventDispatcher);
@@ -79,7 +85,13 @@ class ValidateDatabaseCommand extends ValidateCommand
 
         $validator = $validatorBuilder->getValidator();
 
-        $this->logger->notice('Found ' . count($validator->getConstraints()) . ' constraints to validate...');
+        $constraintsNum = count($validator->getConstraints());
+        if ($constraintsNum) {
+            $this->logger->notice('Found ' . count($validator->getConstraints()) . ' constraints to validate...');
+        } else {
+            $this->logger->error('Found no constraints to validate');
+            return Command::FAILURE;
+        }
 
         if (function_exists('pcntl_signal'))
         {

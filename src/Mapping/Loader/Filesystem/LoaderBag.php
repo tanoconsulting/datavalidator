@@ -2,9 +2,9 @@
 
 namespace TanoConsulting\DataValidatorBundle\Mapping\Loader\Filesystem;
 
-use TanoConsulting\DataValidatorBundle\Mapping\Loader\InlineLoader as BaseInlineLoader;
+use TanoConsulting\DataValidatorBundle\Mapping\Loader\LoaderBag as BaseLoaderBag;
 
-class InlineLoader extends BaseInlineLoader
+class LoaderBag extends BaseLoaderBag
 {
     static $DEFAULT_NAMESPACE = '\\TanoConsulting\\DataValidatorBundle\\Constraints\\Filesystem\\';
 }

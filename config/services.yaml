@@ -1,3 +1,8 @@
+parameters:
+    # Each element for these arrays is a constraint definition. See the examples in docs/samples for the format
+    data_validator.constraints.database: []
+    data_validator.constraints.filesystem: []
+
 services:
     _defaults:
         autowire: true
@@ -9,3 +14,11 @@ services:
     TanoConsulting\DataValidatorBundle\Command\ValidateDatabaseCommand:
         tags:
             - { name: kernel.event_listener, event: before.constraint.validation, method: onBeforeConstraintValidation }
+
+    TanoConsulting\DataValidatorBundle\Mapping\Loader\Database\TaggedServiceLoader:
+        class: TanoConsulting\DataValidatorBundle\Mapping\Loader\Database\TaggedServiceLoader
+        arguments: [ '%data_validator.constraints.database%' ]
+
+    TanoConsulting\DataValidatorBundle\Mapping\Loader\Filesystem\TaggedServiceLoader:
+        class: TanoConsulting\DataValidatorBundle\Mapping\Loader\Filesystem\TaggedServiceLoader
+        arguments: [ '%data_validator.constraints.filesystem%' ]
