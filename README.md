@@ -23,10 +23,17 @@ enforce data integrity, such as f.e.:
 In all those cases, a separate tool which can validate that the data stored in the database adheres to a set of
 rules can come in handy.
 
+Requirements:
+-------------
+
+- php 7.3 or later
+- a database supported by Doctrine DBAL (2.11 or 3.0 or later)
+- Symfony components: see `composer.json`
+
 Usage:
 ------
 
-1. define the set of constraints in a yaml or json file. This sample shows the supported syntax:
+1. the set of constraints can be defined in a yaml or json file. This sample shows the supported syntax:
 
     ```yaml
     constraints:
@@ -57,7 +64,30 @@ Usage:
 
 2. run the validation command
 
-        php bin/console datavalidator:validate:database --database=... --schema-file=...
+        php bin/console datavalidator:validate:database --schema-file=<my_schema_constraints.yaml>
+
+    This presumes that your application has set up a database connection configuration doctrine named `default`.
+    If that is not the case, you can run:
+
+        php bin/console datavalidator:validate:database --schema-file=<my_schema_constraints.yaml> --database=<mysql://user:pwd@localhost/mydb>
+
+    If you want to list the validations constraints without validating them run:
+
+        php bin/console datavalidator:validate:database --schema-file=<my_schema_constraints.yaml> --dry-run
+
+    By default the results show the number of database rows found which violate each constraint. To see the data of
+    those rows instead, use:
+
+        php bin/console datavalidator:validate:database --schema-file=<my_schema_constraints.yaml> --display-data
+
+3. defining validation constraints in your code
+
+    Instead of using a dedicated configuration file on the command line, you can configure the validation constraints in
+    code, either:
+
+    - by setting a value to configuration parameter `data_validator.constraints.database`, or
+    - by tagging services with the `data_validator.constraint_provider.database` tag. Those services will have to
+      implement a public method `getConstraintDefinitions()` that returns all the relevant constraints definitions
 
 Constraints currently supported:
 --------------------------------
@@ -66,6 +96,13 @@ Constraints currently supported:
 - custom sql queries
 
 See the doc/samples folder for examples constraints of well-known applications' database schemas.
+
+Troubleshooting
+---------------
+
+- use the `-v` command line option to see details of execution
+- if the execution of the constraint validation is taking a long time, you can use CTRL-C to stop execution halfway:
+  the script will exit gracefully printing any violation found up to that point
 
 Thanks
 ------
