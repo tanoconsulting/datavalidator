@@ -83,7 +83,7 @@ Quick start
 Constraints currently supported
 -------------------------------
 
-- foreign key definitions (WIP)
+- foreign key definitions
 - custom sql queries
 
 See the doc/samples folder for examples constraints of well-known applications' database schemas.
