@@ -1,15 +1,15 @@
 DB Data Validator Bundle
 ========================
 
-Goals:
-------
+Goals
+-----
 
 Allow checking integrity of data in a database, going beyond what the database schema definition enforces.
 
-Allow checking the integrity of a set of files.
+Allow checking the integrity of a set of files (WIP).
 
-Usecases:
----------
+Usecase
+-------
 
 There are many scenarios in which usage of the constraints configured in a database schema is not sufficient to
 enforce data integrity, such as f.e.:
@@ -23,15 +23,15 @@ enforce data integrity, such as f.e.:
 In all those cases, a separate tool which can validate that the data stored in the database adheres to a set of
 rules can come in handy.
 
-Requirements:
--------------
+Requirements
+------------
 
 - php 7.3 or later
 - a database supported by Doctrine DBAL (2.11 or 3.0 or later)
 - Symfony components: see `composer.json`
 
-Usage:
-------
+Quick start
+-----------
 
 1. the set of constraints can be defined in a yaml or json file. This sample shows the supported syntax, using yaml:
 
@@ -80,22 +80,29 @@ Usage:
 
         php bin/console datavalidator:validate:database --schema-file=<my_schema_constraints.yaml> --display-data
 
-3. defining validation constraints in your code
-
-    Instead of using a dedicated configuration file on the command line, you can configure the validation constraints in
-    code, either:
-
-    - by setting a value to configuration parameter `data_validator.constraints.database`, or
-    - by tagging services with the `data_validator.constraint_provider.database` tag. Those services will have to
-      implement a public method `getConstraintDefinitions()` that returns all the relevant constraints definitions
-
-Constraints currently supported:
---------------------------------
+Constraints currently supported
+-------------------------------
 
 - foreign key definitions (WIP)
 - custom sql queries
 
 See the doc/samples folder for examples constraints of well-known applications' database schemas.
+
+More advanced usage
+-------------------
+
+### Defining validation constraints in your code
+
+Instead of using a dedicated configuration file on the command line, you can configure the validation constraints in
+code, either:
+
+- by setting a value to configuration parameter `data_validator.constraints.database`, or
+- by tagging services with the `data_validator.constraint_provider.database` tag. Those services will have to
+  implement a public method `getConstraintDefinitions()` that returns all the relevant constraints definitions
+
+### Creating your own constraint types
+
+WIP
 
 Troubleshooting
 ---------------
@@ -104,7 +111,17 @@ Troubleshooting
 - if the execution of the constraint validation is taking a long time, you can use CTRL-C to stop execution halfway:
   the script will exit gracefully printing any violation found up to that point
 
+FAQ
+---
+
+- Q: can I run the validations in a Controller or Event instead of a cli command? A: technically yes, but it is generally
+  not recommended, as the database queries used for validating the whole data set might take long to execute
+
 Thanks
 ------
 
 Code based on the Symfony/Validator component; thanks to all its developers!
+
+[![License](https://poser.pugx.org/tanoconsulting/datavalidatorbundle/license)](https://packagist.org/packages/tanoconsulting/datavalidatorbundle)
+[![Latest Stable Version](https://poser.pugx.org/tanoconsulting/datavalidatorbundle/v/stable)](https://packagist.org/packages/tanoconsulting/datavalidatorbundle)
+[![Total Downloads](https://poser.pugx.org/tanoconsulting/datavalidatorbundle/downloads)](https://packagist.org/packages/tanoconsulting/datavalidatorbundle)

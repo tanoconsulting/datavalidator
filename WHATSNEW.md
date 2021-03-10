@@ -3,6 +3,8 @@ Version 1.0-alpha2
 
 - Fixed: in dry-run mode, use the correct name for foreign-key constraints
 
+- Fixed: use appropriate exceptions when invalid constraint definitions are found
+
 - New: allow defining constraints via a symfony config parameter or tagged services instead of a yaml file
 
 - New: allow interrupting gracefully the validation command (using CTRL-C / sigterm or sigint)
