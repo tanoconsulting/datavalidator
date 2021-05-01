@@ -1,3 +1,17 @@
+Version 1.0-beta1 (unreleased)
+==============================
+
+- New: the Validator used to check each type of Constraint can now be a Symfony Service instead of a plain php class.
+  The logic has been changed so that the name of the Validator obtained by the constraint is first checked against
+  existing services in the Container. If a service is found it is used. If not, the name is asssumed to be a class
+  name, and an instance of that class is created on the fly
+
+- New: it is now possible to declare a set required tables for SQL Query constraints. If any of those tables is missing
+  from the database, the constraint check will be skipped
+
+- Fixed: the numeric suffix in the constraint names used for foreign keys now starts correctly at 1
+
+
 Version 1.0-alpha2
 ==================
 

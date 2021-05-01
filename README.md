@@ -60,6 +60,8 @@ Quick start
         Query:
           name: classes_with_same_identifier
           sql: 'SELECT identifier, COUNT(*) AS identical_identifiers FROM ezcontentclass WHERE version = 0 GROUP BY identifier HAVING COUNT(*) > 1'
+          # skip the validation of this constraint in a silent manner if the table is missing by using the line below:
+          requires: {table: ezcontentclass}
     ```
 
 2. run the validation command
