@@ -10,8 +10,6 @@ use TanoConsulting\DataValidatorBundle\Context\ExecutionContextInterface;
 
 class ForeignKeyValidator extends DatabaseValidator
 {
-    protected static $tables;
-
     /**
      * @param string|Connection $value string format: 'mysql://user:secret@localhost/mydb'
      * @param Constraint $constraint
@@ -27,7 +25,7 @@ class ForeignKeyValidator extends DatabaseValidator
         switch($this->context->getOperatingMode()) {
             case ExecutionContextInterface::MODE_COUNT:
                 // skip check if either table does not exist
-                if (!$this->tablesExist($constraint, $connection))
+                if ($this->shouldSkipConstraint($constraint, $connection))
                 {
                     /// @todo emit a warning
                     return;
@@ -44,7 +42,7 @@ class ForeignKeyValidator extends DatabaseValidator
 
             case ExecutionContextInterface::MODE_FETCH:
                 // skip check if either table does not exist
-                if (!$this->tablesExist($constraint, $connection))
+                if ($this->shouldSkipConstraint($constraint, $connection))
                 {
                     /// @todo emit a warning
                     return;
@@ -193,27 +191,17 @@ class ForeignKeyValidator extends DatabaseValidator
         return $name;
     }
 
-    protected function tablesExist($constraint, $connection)
+    /// @todo what about skipping if one column is missing ?
+    protected function shouldSkipConstraint($constraint, $connection)
     {
         $childTable = key($constraint->child);
         $parentTable = key($constraint->parent);
 
         $this->analyzeSchema($connection);
         if (!isset(static::$tables[$childTable]) || !isset(static::$tables[$parentTable])) {
-            return false;
+            return true;
         }
 
-        return true;
-    }
-
-    protected function analyzeSchema($connection)
-    {
-        if (static::$tables === null) {
-            /** @var \Doctrine\DBAL\Schema\AbstractSchemaManager $sm */
-            $sm = $connection->getSchemaManager();
-            foreach ($sm->listTables() as $table) {
-                static::$tables[$table->getName()] = $table->getName();
-            }
-        }
+        return false;
     }
 }

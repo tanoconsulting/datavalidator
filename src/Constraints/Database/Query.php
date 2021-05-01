@@ -6,9 +6,15 @@ use TanoConsulting\DataValidatorBundle\Constraints\DatabaseConstraint;
 
 class Query extends DatabaseConstraint
 {
-    static protected $defaultName = 'QUERY_';
+    static protected $defaultName = 'query_';
 
     public $sql;
+
+    /**
+     * @var null|array When not null, the query will be skipped if the reuired db asset is missing. Format:
+     *                 'table' => 'emp' or 'table' => ['emp', 'dept']
+     */
+    public $requires;
 
     //public $message = 'This value is not valid.';
 

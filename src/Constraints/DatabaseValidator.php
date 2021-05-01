@@ -8,6 +8,9 @@ use TanoConsulting\DataValidatorBundle\ConstraintValidator;
 
 abstract class DatabaseValidator extends ConstraintValidator
 {
+    /** @var \Doctrine\DBAL\Schema\Table[] */
+    protected static $tables;
+
     /**
      * @param string|Connection $dsnOrConnection string format: 'mysql://user:secret@localhost/mydb'
      * @return Connection
@@ -21,5 +24,16 @@ abstract class DatabaseValidator extends ConstraintValidator
         }
 
         return $dsnOrConnection;
+    }
+
+    protected function analyzeSchema($connection)
+    {
+        if (static::$tables === null) {
+            /** @var \Doctrine\DBAL\Schema\AbstractSchemaManager $sm */
+            $sm = $connection->getSchemaManager();
+            foreach ($sm->listTables() as $table) {
+                static::$tables[$table->getName()] = $table;
+            }
+        }
     }
 }
