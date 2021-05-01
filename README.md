@@ -64,21 +64,21 @@ Quick start
 
 2. run the validation command
 
-        php bin/console datavalidator:validate:database --schema-file=<my_schema_constraints.yaml>
+        php bin/console datavalidator:validate:database --config-file=<my_schema_constraints.yaml>
 
     This presumes that your application has set up a database connection configuration doctrine named `default`.
     If that is not the case, you can run:
 
-        php bin/console datavalidator:validate:database --schema-file=<my_schema_constraints.yaml> --database=<mysql://user:pwd@localhost/mydb>
+        php bin/console datavalidator:validate:database --config-file=<my_schema_constraints.yaml> --database=<mysql://user:pwd@localhost/mydb>
 
     If you want to list the validations constraints without validating them run:
 
-        php bin/console datavalidator:validate:database --schema-file=<my_schema_constraints.yaml> --dry-run
+        php bin/console datavalidator:validate:database --config-file=<my_schema_constraints.yaml> --dry-run
 
     By default the results show the number of database rows found which violate each constraint. To see the data of
     those rows instead, use:
 
-        php bin/console datavalidator:validate:database --schema-file=<my_schema_constraints.yaml> --display-data
+        php bin/console datavalidator:validate:database --config-file=<my_schema_constraints.yaml> --display-data
 
 Constraints currently supported
 -------------------------------

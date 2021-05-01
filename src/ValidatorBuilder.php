@@ -10,6 +10,9 @@ use TanoConsulting\DataValidatorBundle\Mapping\Factory\MetadataFactoryInterface;
 use TanoConsulting\DataValidatorBundle\Mapping\Loader\Database\FileLoader;
 use TanoConsulting\DataValidatorBundle\Mapping\Loader\LoaderInterface;
 
+/**
+ * @todo add an interface
+ */
 abstract class ValidatorBuilder
 {
     /**

@@ -4,9 +4,13 @@ namespace TanoConsulting\DataValidatorBundle\Context;
 
 class FilesystemExecutionContext extends ExecutionContext
 {
-    /// @todo ...
-    public function __construct()
+    /**
+     * @param int $operatingMode
+     */
+    public function __construct($operatingMode = self::MODE_COUNT)
     {
+        $this->operatingMode = $operatingMode;
+
         parent::__construct();
     }
 }

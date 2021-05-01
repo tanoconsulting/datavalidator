@@ -2,24 +2,40 @@
 
 namespace TanoConsulting\DataValidatorBundle\Command;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use TanoConsulting\DataValidatorBundle\Context\FilesystemExecutionContext;
+use TanoConsulting\DataValidatorBundle\FilesystemValidatorBuilder;
+use TanoConsulting\DataValidatorBundle\Mapping\Loader\Filesystem\TaggedServiceLoader;
 
-class ValidateFilesystemCommand extends Command
+class ValidateFilesystemCommand extends ValidateCommand
 {
     protected static $defaultName = 'datavalidator:validate:filesystem';
+
+    public function __construct(EventDispatcherInterface $eventDispatcher = null, TaggedServiceLoader $taggedServicesLoader = null,
+        LoggerInterface $datavalidatorLogger = null)
+    {
+        parent::__construct($eventDispatcher, $taggedServicesLoader, $datavalidatorLogger);
+    }
 
     protected function configure()
     {
         parent::configure();
+
+        /// @todo...
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function getValidatorBuilder()
     {
-        /// @todo ...
-        throw new \Exception('Not implemented yet');
+        return new FilesystemValidatorBuilder();
+    }
 
-        return Command::SUCCESS;
+    protected function getValidationTarget($input)
+    {
+        /// @todo...
     }
 }

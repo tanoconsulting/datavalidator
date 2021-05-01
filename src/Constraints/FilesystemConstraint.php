@@ -6,8 +6,7 @@ use TanoConsulting\DataValidatorBundle\Constraint;
 
 abstract class FilesystemConstraint extends Constraint
 {
-    //public const FILE_CONSTRAINT = 'file';
-
+    public const FILE_CONSTRAINT = 'file';
     public const DIRECTORY_CONSTRAINT = 'directory';
 
     public function getTargets()
