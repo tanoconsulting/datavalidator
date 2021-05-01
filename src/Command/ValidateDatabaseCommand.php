@@ -3,13 +3,10 @@
 namespace TanoConsulting\DataValidatorBundle\Command;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use TanoConsulting\DataValidatorBundle\ContainerConstraintValidatorFactory;
 use TanoConsulting\DataValidatorBundle\DatabaseValidatorBuilder;
 use TanoConsulting\DataValidatorBundle\Mapping\Loader\Database\TaggedServiceLoader;
 
@@ -19,11 +16,11 @@ class ValidateDatabaseCommand extends ValidateCommand
     protected $container;
 
     public function __construct(EventDispatcherInterface $eventDispatcher = null, TaggedServiceLoader $taggedServicesLoader = null,
-        LoggerInterface $datavalidatorLogger = null, ContainerInterface $container = null)
+        ContainerConstraintValidatorFactory $constraintValidatorFactory, LoggerInterface $datavalidatorLogger = null, ContainerInterface $container = null)
     {
         $this->container = $container;
 
-        parent::__construct($eventDispatcher, $taggedServicesLoader, $datavalidatorLogger);
+        parent::__construct($eventDispatcher, $taggedServicesLoader, $constraintValidatorFactory, $datavalidatorLogger);
     }
 
     protected function configure()

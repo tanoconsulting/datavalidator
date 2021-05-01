@@ -12,13 +12,13 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
      */
     public function getInstance(Constraint $constraint)
     {
-        /// @todo throw on unsupported constraints
-
         $className = $constraint->validatedBy();
 
         if (!isset($this->validators[$className])) {
             $this->validators[$className] = new $className();
         }
+
+        /// @todo throw if validator does not support the correct interface
 
         return $this->validators[$className];
     }

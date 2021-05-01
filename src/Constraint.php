@@ -156,7 +156,7 @@ abstract class Constraint
      *
      * @return string|string[] One or more constant values
      */
-    //abstract public function getTargets();
+    abstract public function getTargets();
 
     /**
      * NB: this is not in the upstream API

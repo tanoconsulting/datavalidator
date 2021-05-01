@@ -15,6 +15,9 @@ services:
         tags:
             - { name: kernel.event_listener, event: before.constraint.validation, method: onBeforeConstraintValidation }
 
+    TanoConsulting\DataValidatorBundle\ContainerConstraintValidatorFactory:
+        class: TanoConsulting\DataValidatorBundle\ContainerConstraintValidatorFactory
+
     TanoConsulting\DataValidatorBundle\Mapping\Loader\Database\TaggedServiceLoader:
         class: TanoConsulting\DataValidatorBundle\Mapping\Loader\Database\TaggedServiceLoader
         arguments: [ '%data_validator.constraints.database%' ]

@@ -16,7 +16,7 @@ abstract class DatabaseConstraint extends Constraint
      */
     //public const DATABASE_COLUMN_CONSTRAINT = 'database_column';
 
-    static protected $constraintsIndex = 1;
+    static protected $constraintsIndex = [];
     static protected $defaultName = 'DB_CONSTRAINT_';
 
     protected $name;
@@ -30,8 +30,11 @@ abstract class DatabaseConstraint extends Constraint
     {
         parent::__construct($options);
         if ($this->name === null) {
-            $this->name = static::$defaultName . static::$constraintsIndex;
-            self::$constraintsIndex++;
+            if (!isset(self::$constraintsIndex[static::$defaultName])) {
+                self::$constraintsIndex[static::$defaultName] = 1;
+            }
+            $this->name = static::$defaultName . self::$constraintsIndex[static::$defaultName];
+            self::$constraintsIndex[static::$defaultName]++;
         }
     }
 

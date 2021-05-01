@@ -9,23 +9,27 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use TanoConsulting\DataValidatorBundle\Context\ExecutionContextInterface;
-use TanoConsulting\DataValidatorBundle\ValidatorBuilder;
+use TanoConsulting\DataValidatorBundle\ConstraintValidatorFactoryInterface;
+use TanoConsulting\DataValidatorBundle\Context\DatabaseExecutionContext;
 use TanoConsulting\DataValidatorBundle\Event\BeforeConstraintValidatedEvent;
 use TanoConsulting\DataValidatorBundle\Logger\ConsoleLogger;
 use TanoConsulting\DataValidatorBundle\Mapping\Loader\LoaderInterface;
+use TanoConsulting\DataValidatorBundle\ValidatorBuilder;
 
 abstract class ValidateCommand extends Command
 {
     protected $eventDispatcher;
     protected $taggedServicesLoader;
+    protected $constraintValidatorFactory;
     protected $logger;
     protected $echoConstraintExecution = true;
 
-    public function __construct(EventDispatcherInterface $eventDispatcher = null, LoaderInterface $taggedServicesLoader = null, LoggerInterface $datavalidatorLogger = null)
+    public function __construct(EventDispatcherInterface $eventDispatcher = null, LoaderInterface $taggedServicesLoader = null,
+        ConstraintValidatorFactoryInterface $constraintValidatorFactory, LoggerInterface $datavalidatorLogger = null)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->taggedServicesLoader = $taggedServicesLoader;
+        $this->constraintValidatorFactory = $constraintValidatorFactory;
         $this->logger = $datavalidatorLogger;
 
         parent::__construct();
@@ -36,7 +40,7 @@ abstract class ValidateCommand extends Command
         $this
             ->addOption('config-file', null, InputOption::VALUE_REQUIRED, 'A yaml/json file defining the constraints to check. If omitted: load them from config/services')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Only display the list of constraints')
-            ->addOption('display-data', null, InputOption::VALUE_NONE, 'Display the offending table rows, not only their count')
+            ->addOption('display-data', null, InputOption::VALUE_NONE, 'Display the offending data (table rows / files), not only their count')
             /// @todo allow filtering...
             //->addOption('omit-constraints', null, InputOption::VALUE_REQUIRED, 'A csv list of constraints not to check')
             //->addOption('only-constraints', null, InputOption::VALUE_REQUIRED, 'A csv list of constraints to check')
@@ -57,6 +61,12 @@ abstract class ValidateCommand extends Command
         $this->setLogger(new ConsoleLogger($output));
 
         $validatorBuilder = $this->getValidatorBuilder();
+        $validatorBuilder->setConstraintValidatorFactory($this->constraintValidatorFactory);
+        if ($input->getOption('dry-run')) {
+            $validatorBuilder->setOperatingMode(DatabaseExecutionContext::MODE_DRY_RUN);
+        } else if ($input->getOption('display-data')) {
+            $validatorBuilder->setOperatingMode(DatabaseExecutionContext::MODE_FETCH);
+        }
 
         if ($configFile = $input->getOption('config-file')) {
             $validatorBuilder->addFileMapping($configFile);

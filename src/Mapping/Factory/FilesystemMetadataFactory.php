@@ -6,10 +6,14 @@ use TanoConsulting\DataValidatorBundle\Mapping\FilesystemMetaData;
 
 class FilesystemMetadataFactory extends MetadataFactory implements MetadataFactoryInterface
 {
+    protected $metadata;
+
     public function getMetadata()
     {
-        $metadata = new FilesystemMetaData();
-        $this->loader->loadMetadata($metadata);
-        return $metadata;
+        if (!$this->metadata) {
+            $this->metadata = new FilesystemMetaData();
+            $this->loader->loadMetadata($this->metadata);
+        }
+        return $this->metadata;
     }
 }
