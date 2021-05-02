@@ -29,7 +29,7 @@ class ValidateDatabaseCommand extends ValidateCommand
 
         $this
             ->setDescription('Validates data in the database against a set of constraints')
-            ->addOption('database', null, InputOption::VALUE_NONE, "The dsn of the database to connect to, eg: 'mysql://user:secret@localhost/mydb' or the doctrine connection name, eg, 'default'")
+            ->addOption('database', null, InputOption::VALUE_REQUIRED, "The dsn of the database to connect to, eg: 'mysql://user:secret@localhost/mydb' or the doctrine connection name, eg, 'default'")
         ;
     }
 

@@ -25,7 +25,7 @@ class ValidateFilesystemCommand extends ValidateCommand
 
         $this
             ->setDescription('Validates data in the filesystem against a set of constraints')
-            ->addOption('path', null, InputOption::VALUE_NONE, "The root path to start scanning eg: '/var/my_data'. If not specified, the current directory is used")
+            ->addOption('path', null, InputOption::VALUE_REQUIRED, "The root path to start scanning eg: '/var/my_data'. If not specified, the current directory is used")
         ;
     }
 
@@ -43,7 +43,7 @@ class ValidateFilesystemCommand extends ValidateCommand
 
         $path = realpath($path);
 
-        /// @todo should we check that this is a directory ?
+        /// @todo we should check that $path is a directory
 
         return $path;
     }
