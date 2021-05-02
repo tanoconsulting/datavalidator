@@ -12,6 +12,8 @@ Version 1.0-beta1 (unreleased)
 - New: its is now possible to run filesystem validation checks, by using the command `datavalidator:validate:filesystem`.
   For the moment, the only available constraint is a regular expression to apply on file/folder names
 
+- Fixed: the `--database` option of command `datavalidator:validate:database` was not accepting values
+
 - Fixed: the numeric suffix in the constraint names used for foreign keys now starts correctly at 1
 
 

@@ -67,6 +67,7 @@ abstract class ValidateCommand extends Command
         $operatingMode = ExecutionContext::MODE_COUNT;
         if ($input->getOption('dry-run')) {
             $operatingMode = ExecutionContext::MODE_DRY_RUN;
+            $this->echoConstraintExecution = false;
         } else if ($input->getOption('display-data')) {
             $operatingMode = ExecutionContext::MODE_FETCH;
         }
@@ -80,9 +81,9 @@ abstract class ValidateCommand extends Command
 
         $validatorBuilder->setEventDispatcher($this->eventDispatcher);
 
-        $validationTarget = $this->getValidationTarget($input);
-
         $validator = $validatorBuilder->getValidator();
+
+        $validationTarget = $this->getValidationTarget($input);
 
         $constraintsNum = count($validator->getConstraints());
         if ($constraintsNum) {
