@@ -10,7 +10,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use TanoConsulting\DataValidatorBundle\ConstraintValidatorFactoryInterface;
-use TanoConsulting\DataValidatorBundle\Context\DatabaseExecutionContext;
+use TanoConsulting\DataValidatorBundle\ConstraintViolation;
+use TanoConsulting\DataValidatorBundle\Context\ExecutionContext;
 use TanoConsulting\DataValidatorBundle\Event\BeforeConstraintValidatedEvent;
 use TanoConsulting\DataValidatorBundle\Logger\ConsoleLogger;
 use TanoConsulting\DataValidatorBundle\Mapping\Loader\LoaderInterface;
@@ -62,11 +63,14 @@ abstract class ValidateCommand extends Command
 
         $validatorBuilder = $this->getValidatorBuilder();
         $validatorBuilder->setConstraintValidatorFactory($this->constraintValidatorFactory);
+
+        $operatingMode = ExecutionContext::MODE_COUNT;
         if ($input->getOption('dry-run')) {
-            $validatorBuilder->setOperatingMode(DatabaseExecutionContext::MODE_DRY_RUN);
+            $operatingMode = ExecutionContext::MODE_DRY_RUN;
         } else if ($input->getOption('display-data')) {
-            $validatorBuilder->setOperatingMode(DatabaseExecutionContext::MODE_FETCH);
+            $operatingMode = ExecutionContext::MODE_FETCH;
         }
+        $validatorBuilder->setOperatingMode($operatingMode);
 
         if ($configFile = $input->getOption('config-file')) {
             $validatorBuilder->addFileMapping($configFile);
@@ -97,38 +101,10 @@ abstract class ValidateCommand extends Command
         /// @todo give signs of life during validation by writing something to stdout (stderr?)
         $violations = $validator->validate($validationTarget);
 
-        $rows = [];
-        if ($input->getOption('dry-run')) {
-            $tableHeaders = ['Constraint', 'Details'];
-            /** @var \TanoConsulting\DataValidatorBundle\ConstraintViolation $violation */
-            foreach($violations as $violation) {
-                $rows[] = [$violation->getConstraint()->getName(), $violation->getMessage()];
-            }
+        $rows = $this->buildResultsTable($violations, $operatingMode);
+        $tableHeaders = array_shift($rows);
 
-        } elseif($input->getOption('display-data')) {
-            /// @todo improve output: display as well FK defs/sql query ?
-
-            $tableHeaders = ['Constraint', 'Violation', 'Data'];
-            /** @var \TanoConsulting\DataValidatorBundle\ConstraintViolation $violation */
-            foreach($violations as $violation) {
-                $data = $violation->getInvalidValue();
-                if (is_array($data)) {
-                    foreach ($data as $i => $value) {
-                        $rows[] = [$violation->getConstraint()->getName(), $i+1, preg_replace('/([\n\r] *)+/', ' ', json_encode($value))];
-                    }
-                } else {
-                    // exceptions and similar...
-                    $rows[] = [$violation->getConstraint()->getName(), 1, $violation->getMessage()];
-                }
-            }
-
-        } else {
-            $tableHeaders = ['Constraint', 'Violations', 'Details'];
-            /** @var \TanoConsulting\DataValidatorBundle\ConstraintViolation $violation */
-            foreach($violations as $violation) {
-                $rows[] = [$violation->getConstraint()->getName(), $violation->getInvalidValue(), $violation->getMessage()];
-            }
-        }
+        // save memory
         unset($violations);
 
         $table = new Table($output);
@@ -144,7 +120,7 @@ abstract class ValidateCommand extends Command
         );
 
         // for dry run mode, the error is when there are no constraints defined...
-        return (count($rows) xor $input->getOption('dry-run')) ? Command::FAILURE : Command::SUCCESS;
+        return (count($rows) xor $operatingMode === ExecutionContext::MODE_DRY_RUN) ? Command::FAILURE : Command::SUCCESS;
     }
 
     public function onBeforeConstraintValidation(BeforeConstraintValidatedEvent $event)
@@ -157,6 +133,73 @@ abstract class ValidateCommand extends Command
     protected function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
+    }
+
+    /**
+     * @param ConstraintViolation[] $violations
+     * @param int $operatingMode
+     * @return array[] First row are table headers
+     */
+    protected function buildResultsTable($violations, $operatingMode)
+    {
+        $rows = [];
+        switch ($operatingMode) {
+            case ExecutionContext::MODE_DRY_RUN:
+                $rows = [['Constraint', 'Details']];
+
+                foreach($violations as $violation) {
+                    $rows[] = [$violation->getConstraint()->getName(), $violation->getMessage()];
+                }
+                break;
+
+            case ExecutionContext::MODE_FETCH:
+                /// @todo improve output: display as well the violation message ?
+
+                $rows = [['Constraint', 'Violation', 'Data']];
+                foreach($violations as $violation) {
+                    $data = $violation->getInvalidValue();
+                    /// @todo handle iterable $data the same way as we do arrays
+                    if (is_array($data)) {
+                        $i = 0;
+                        foreach ($data as $value) {
+                            $rows[] = [$violation->getConstraint()->getName(), ++$i, $this->toString($value)];
+                        }
+                    } else {
+                        $rows[] = [$violation->getConstraint()->getName(), 1, $this->toString($data)];
+                    }
+                }
+                break;
+
+            case ExecutionContext::MODE_COUNT:
+                $rows = [['Constraint', 'Violations', 'Details']];
+                // we expect the violation value to always be an integer
+                foreach($violations as $violation) {
+                    $rows[] = [$violation->getConstraint()->getName(), $violation->getInvalidValue(), $violation->getMessage()];
+                }
+                break;
+
+            /// @todo break on unsupported modes
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Used for building a string representation of violation data
+     * @param mixed $value
+     * @return float|int|string
+     */
+    protected function toString($value)
+    {
+        if ($value instanceof \Throwable) {
+            $value = $value->getMessage();
+        }
+
+        if (is_string($value) || is_int($value) || is_float($value)) {
+            return $value;
+        }
+
+        return preg_replace('/([\n\r] *)+/', ' ', json_encode($value));
     }
 
     /**

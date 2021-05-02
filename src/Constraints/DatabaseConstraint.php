@@ -17,24 +17,28 @@ abstract class DatabaseConstraint extends Constraint
     //public const DATABASE_COLUMN_CONSTRAINT = 'database_column';
 
     static protected $constraintsIndex = [];
-    static protected $defaultName = 'DB_CONSTRAINT_';
+
+    static protected $targets = self::DATABASE_CONSTRAINT;
 
     protected $name;
 
     public function getTargets()
     {
-        return self::DATABASE_CONSTRAINT;
+        return static::$targets;
     }
 
     public function __construct($options = null /*, array $groups = null, $payload = null*/)
     {
         parent::__construct($options);
+
         if ($this->name === null) {
-            if (!isset(self::$constraintsIndex[static::$defaultName])) {
-                self::$constraintsIndex[static::$defaultName] = 1;
+            /// @todo handle better the case of constraints from other bundles with same name as ours
+            $className = implode('\\', array_slice(explode('\\', static::class), -2));
+            if (!isset(self::$constraintsIndex[$className])) {
+                self::$constraintsIndex[$className] = 1;
             }
-            $this->name = static::$defaultName . self::$constraintsIndex[static::$defaultName];
-            self::$constraintsIndex[static::$defaultName]++;
+            $this->name = $className . '::' . self::$constraintsIndex[$className];
+            self::$constraintsIndex[$className]++;
         }
     }
 

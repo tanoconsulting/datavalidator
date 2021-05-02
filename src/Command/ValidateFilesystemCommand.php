@@ -3,6 +3,7 @@
 namespace TanoConsulting\DataValidatorBundle\Command;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use TanoConsulting\DataValidatorBundle\ContainerConstraintValidatorFactory;
 use TanoConsulting\DataValidatorBundle\FilesystemValidatorBuilder;
@@ -22,7 +23,10 @@ class ValidateFilesystemCommand extends ValidateCommand
     {
         parent::configure();
 
-        /// @todo...
+        $this
+            ->setDescription('Validates data in the filesystem against a set of constraints')
+            ->addOption('path', null, InputOption::VALUE_NONE, "The root path to start scanning eg: '/var/my_data'. If not specified, the current directory is used")
+        ;
     }
 
     protected function getValidatorBuilder()
@@ -32,6 +36,15 @@ class ValidateFilesystemCommand extends ValidateCommand
 
     protected function getValidationTarget($input)
     {
-        /// @todo...
+        $path = $input->getOption('path');
+        if ($path === null || $path === '') {
+            $path = getcwd();
+        }
+
+        $path = realpath($path);
+
+        /// @todo should we check that this is a directory ?
+
+        return $path;
     }
 }

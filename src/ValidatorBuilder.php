@@ -4,10 +4,9 @@ namespace TanoConsulting\DataValidatorBundle;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
-use TanoConsulting\DataValidatorBundle\Context\DatabaseExecutionContext;
+use TanoConsulting\DataValidatorBundle\Context\ExecutionContext;
 use TanoConsulting\DataValidatorBundle\Context\ExecutionContextFactoryInterface;
 use TanoConsulting\DataValidatorBundle\Mapping\Factory\MetadataFactoryInterface;
-use TanoConsulting\DataValidatorBundle\Mapping\Loader\Database\FileLoader;
 use TanoConsulting\DataValidatorBundle\Mapping\Loader\LoaderInterface;
 
 /**
@@ -33,7 +32,7 @@ abstract class ValidatorBuilder
     /** @var ExecutionContextFactoryInterface|null */
     protected $executionContextFactory;
 
-    protected $operatingMode = DatabaseExecutionContext::MODE_COUNT;
+    protected $operatingMode = ExecutionContext::MODE_COUNT;
 
     protected $eventDispatcher;
 
@@ -113,16 +112,7 @@ abstract class ValidatorBuilder
         return $this;
     }
 
-    public function getLoaders()
-    {
-        $loaders = [];
-
-        foreach ($this->fileMappings as $fileMapping) {
-            $loaders[] = new FileLoader($fileMapping);
-        }
-
-        return array_merge($loaders, $this->loaders);
-    }
+    abstract public function getLoaders();
 
     public function setOperatingMode($mode)
     {

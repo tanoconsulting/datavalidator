@@ -5,6 +5,7 @@ namespace TanoConsulting\DataValidatorBundle;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use TanoConsulting\DataValidatorBundle\Context\DatabaseExecutionContextFactory;
 use TanoConsulting\DataValidatorBundle\Mapping\Factory\DatabaseMetadataFactory;
+use TanoConsulting\DataValidatorBundle\Mapping\Loader\Database\FileLoader;
 use TanoConsulting\DataValidatorBundle\Mapping\Loader\LoaderChain;
 use TanoConsulting\DataValidatorBundle\Validator\DatabaseValidator;
 
@@ -39,5 +40,16 @@ class DatabaseValidatorBuilder extends ValidatorBuilder
         $eventDispatcher = $this->eventDispatcher;
 
         return new DatabaseValidator($contextFactory, $metadataFactory, $validatorFactory, $eventDispatcher);
+    }
+
+    public function getLoaders()
+    {
+        $loaders = [];
+
+        foreach ($this->fileMappings as $fileMapping) {
+            $loaders[] = new FileLoader($fileMapping);
+        }
+
+        return array_merge($loaders, $this->loaders);
     }
 }

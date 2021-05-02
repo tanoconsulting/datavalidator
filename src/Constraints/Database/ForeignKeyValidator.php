@@ -7,6 +7,7 @@ use TanoConsulting\DataValidatorBundle\Constraint;
 use TanoConsulting\DataValidatorBundle\Constraints\DatabaseValidator;
 use TanoConsulting\DataValidatorBundle\ConstraintViolation;
 use TanoConsulting\DataValidatorBundle\Context\ExecutionContextInterface;
+use TanoConsulting\DataValidatorBundle\Exception\UnexpectedTypeException;
 
 class ForeignKeyValidator extends DatabaseValidator
 {
@@ -14,9 +15,14 @@ class ForeignKeyValidator extends DatabaseValidator
      * @param string|Connection $value string format: 'mysql://user:secret@localhost/mydb'
      * @param Constraint $constraint
      * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws UnexpectedTypeException
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof ForeignKey) {
+            throw new UnexpectedTypeException($constraint, ForeignKey::class);
+        }
+
         /** @var Connection $connection */
         $connection = $this->getConnection($value);
 
@@ -35,8 +41,8 @@ class ForeignKeyValidator extends DatabaseValidator
                     if ($violationCount) {
                         $this->context->addViolation(new ConstraintViolation($this->getMessage($constraint), $violationCount, $constraint));
                     }
-                } catch (\Exception $e) {
-                    $this->context->addViolation(new ConstraintViolation(preg_replace('/\n */', ' ', $e->getMessage()), null, $constraint));
+                } catch (\Throwable $e) {
+                    $this->context->addViolation(new ConstraintViolation($e->getMessage(), 1, $constraint));
                 }
                 break;
 
@@ -52,8 +58,8 @@ class ForeignKeyValidator extends DatabaseValidator
                     if ($violationData) {
                         $this->context->addViolation(new ConstraintViolation($this->getMessage($constraint), $violationData, $constraint));
                     }
-                } catch (\Exception $e) {
-                    $this->context->addViolation(new ConstraintViolation(preg_replace('/\n */', ' ', $e->getMessage()), null, $constraint));
+                } catch (\Throwable $e) {
+                    $this->context->addViolation(new ConstraintViolation($this->getMessage($constraint), $e, $constraint));
                 }
                 break;
 
@@ -64,7 +70,8 @@ class ForeignKeyValidator extends DatabaseValidator
         }
     }
 
-    protected function getMessage($constraint)
+    /// @todo improve: return human-readable form instead of json. Also, move the error message into the Constraint, as is done by upstream validator
+    protected function getMessage(ForeignKey $constraint)
     {
         return preg_replace('/\n */', ' ', json_encode(
             ['child' => $constraint->child, 'parent' => $constraint->parent, 'except' => $constraint->except])

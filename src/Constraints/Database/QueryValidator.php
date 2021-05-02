@@ -8,6 +8,7 @@ use TanoConsulting\DataValidatorBundle\Constraints\DatabaseValidator;
 use TanoConsulting\DataValidatorBundle\ConstraintViolation;
 use TanoConsulting\DataValidatorBundle\Context\ExecutionContextInterface;
 use TanoConsulting\DataValidatorBundle\Exception\ConstraintDefinitionException;
+use TanoConsulting\DataValidatorBundle\Exception\UnexpectedTypeException;
 
 class QueryValidator extends DatabaseValidator
 {
@@ -18,6 +19,10 @@ class QueryValidator extends DatabaseValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof Query) {
+            throw new UnexpectedTypeException($constraint, Query::class);
+        }
+
         /** @var Connection $connection */
         $connection = $this->getConnection($value);
 
@@ -31,12 +36,13 @@ class QueryValidator extends DatabaseValidator
                 try {
                     $violationCount = $connection->executeQuery('SELECT COUNT(*) AS numrows FROM (' . rtrim($constraint->sql, ';') . ') subquery')->fetchOne();
                     if ($violationCount) {
-                        $this->context->addViolation(new ConstraintViolation($constraint->sql, $violationCount, $constraint));
+                        $this->context->addViolation(new ConstraintViolation($this->getMessage($constraint), $violationCount, $constraint));
                     }
-                } catch (\Exception $e) {
-                    $this->context->addViolation(new ConstraintViolation(preg_replace('/\n */', ' ', $e->getMessage()), null, $constraint));
+                } catch (\Throwable $e) {
+                    $this->context->addViolation(new ConstraintViolation($e->getMessage(), 1, $constraint));
                 }
                 break;
+
             case ExecutionContextInterface::MODE_FETCH:
                 if ($this->shouldSkipConstraint($constraint, $connection))
                 {
@@ -48,14 +54,20 @@ class QueryValidator extends DatabaseValidator
                     if ($violationData) {
                         $this->context->addViolation(new ConstraintViolation($constraint->sql, $violationData, $constraint));
                     }
-                } catch (\Exception $e) {
-                    $this->context->addViolation(new ConstraintViolation(preg_replace('/\n */', ' ', $e->getMessage()), null, $constraint));
+                } catch (\Throwable $e) {
+                    $this->context->addViolation(new ConstraintViolation($this->getMessage($constraint), $e, $constraint));
                 }
                 break;
+
             case ExecutionContextInterface::MODE_DRY_RUN:
                 $this->context->addViolation(new ConstraintViolation($constraint->sql, null, $constraint));
                 break;
         }
+    }
+
+    protected function getMessage(Query $constraint)
+    {
+        return $constraint->sql;
     }
 
     /**
@@ -63,6 +75,7 @@ class QueryValidator extends DatabaseValidator
      * @param Connection $connection
      * @return bool
      * @throws ConstraintDefinitionException
+     * @throws UnexpectedTypeException
      */
     protected function shouldSkipConstraint($constraint, $connection)
     {
@@ -70,20 +83,23 @@ class QueryValidator extends DatabaseValidator
             return false;
         }
 
-        $targets = (array) reset($constraint->requires);
-        $type = key($constraint->requires);
+        foreach ($constraint->requires as $filter) {
+            $value = reset($filter);
+            $criterion = key($filter);
 
-        switch($type) {
-            case 'table':
-                $this->analyzeSchema($connection);
-                foreach ($targets as $target) {
-                    if (!isset(static::$tables[$target])) {
-                        return true;
+            switch ($criterion) {
+                case 'table':
+                case 'tables':
+                    $this->analyzeSchema($connection);
+                    foreach ((array)$value as $target) {
+                        if (!isset(static::$tables[$target])) {
+                            return true;
+                        }
                     }
-                }
-                break;
-            default:
-                throw new ConstraintDefinitionException("Can not check for existence of required db asset of type: $type");
+                    break;
+                default:
+                    throw new ConstraintDefinitionException("Can not check for existence of required db asset of type: $criterion");
+            }
         }
 
         return false;

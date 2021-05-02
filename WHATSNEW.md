@@ -9,6 +9,9 @@ Version 1.0-beta1 (unreleased)
 - New: it is now possible to declare a set required tables for SQL Query constraints. If any of those tables is missing
   from the database, the constraint check will be skipped
 
+- New: its is now possible to run filesystem validation checks, by using the command `datavalidator:validate:filesystem`.
+  For the moment, the only available constraint is a regular expression to apply on file/folder names
+
 - Fixed: the numeric suffix in the constraint names used for foreign keys now starts correctly at 1
 
 

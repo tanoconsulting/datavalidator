@@ -1,5 +1,5 @@
-DB Data Validator Bundle
-========================
+Data Validator Bundle
+=====================
 
 Goals
 -----
