@@ -39,7 +39,6 @@ abstract class ValidateCommand extends Command
     protected function configure()
     {
         $this
-            ->addOption('config-file', null, InputOption::VALUE_REQUIRED, 'A yaml/json file defining the constraints to check. If omitted: load them from config/services')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Only display the list of constraints')
             ->addOption('display-data', null, InputOption::VALUE_NONE, 'Display the offending data (table rows / files), not only their count')
             /// @todo allow filtering...
@@ -61,7 +60,8 @@ abstract class ValidateCommand extends Command
         /// @todo get a standard logger injected via the constructor, push it into the ConsoleLogger
         $this->setLogger(new ConsoleLogger($output));
 
-        $validatorBuilder = $this->getValidatorBuilder();
+        $validatorBuilder = $this->getValidatorBuilder($input);
+
         $validatorBuilder->setConstraintValidatorFactory($this->constraintValidatorFactory);
 
         $operatingMode = ExecutionContext::MODE_COUNT;
@@ -72,12 +72,6 @@ abstract class ValidateCommand extends Command
             $operatingMode = ExecutionContext::MODE_FETCH;
         }
         $validatorBuilder->setOperatingMode($operatingMode);
-
-        if ($configFile = $input->getOption('config-file')) {
-            $validatorBuilder->addFileMapping($configFile);
-        } else {
-            $validatorBuilder->addLoader($this->taggedServicesLoader);
-        }
 
         $validatorBuilder->setEventDispatcher($this->eventDispatcher);
 
@@ -204,9 +198,10 @@ abstract class ValidateCommand extends Command
     }
 
     /**
+     * @param InputInterface $input
      * @return ValidatorBuilder
      */
-    abstract protected function getValidatorBuilder();
+    abstract protected function getValidatorBuilder($input);
 
     /**
      * @param InputInterface $input

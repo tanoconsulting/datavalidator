@@ -26,12 +26,21 @@ class ValidateFilesystemCommand extends ValidateCommand
         $this
             ->setDescription('Validates data in the filesystem against a set of constraints')
             ->addOption('path', null, InputOption::VALUE_REQUIRED, "The root path to start scanning eg: '/var/my_data'. If not specified, the current directory is used")
+            ->addOption('config-file', null, InputOption::VALUE_REQUIRED, 'A yaml/json file defining the constraints to check. If omitted: load them from config/services')
         ;
     }
 
-    protected function getValidatorBuilder()
+    protected function getValidatorBuilder($input)
     {
-        return new FilesystemValidatorBuilder();
+        $validatorBuilder = new FilesystemValidatorBuilder();
+
+        if ($configFile = $input->getOption('config-file')) {
+            $validatorBuilder->addFileMapping($configFile);
+        } else {
+            $validatorBuilder->addLoader($this->taggedServicesLoader);
+        }
+
+        return $validatorBuilder;
     }
 
     protected function getValidationTarget($input)

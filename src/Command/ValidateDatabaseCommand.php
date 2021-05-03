@@ -30,12 +30,21 @@ class ValidateDatabaseCommand extends ValidateCommand
         $this
             ->setDescription('Validates data in the database against a set of constraints')
             ->addOption('database', null, InputOption::VALUE_REQUIRED, "The dsn of the database to connect to, eg: 'mysql://user:secret@localhost/mydb' or the doctrine connection name, eg, 'default'")
+            ->addOption('config-file', null, InputOption::VALUE_REQUIRED, 'A yaml/json file defining the constraints to check. If omitted: load them from config/services')
         ;
     }
 
-    protected function getValidatorBuilder()
+    protected function getValidatorBuilder($input)
     {
-        return new DatabaseValidatorBuilder();
+        $validatorBuilder = new DatabaseValidatorBuilder();
+
+        if ($configFile = $input->getOption('config-file')) {
+            $validatorBuilder->addFileMapping($configFile);
+        } else {
+            $validatorBuilder->addLoader($this->taggedServicesLoader);
+        }
+
+        return $validatorBuilder;
     }
 
     protected function getValidationTarget($input)
