@@ -1,5 +1,5 @@
-Version 1.0-beta1 (unreleased)
-==============================
+Version 1.0-beta1
+=================
 
 - New: the Validator used to check each type of Constraint can now be a Symfony Service instead of a plain php class.
   The logic has been changed so that the name of the Validator obtained by the constraint is first checked against
