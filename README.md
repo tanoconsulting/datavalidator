@@ -109,9 +109,15 @@ WIP
 Troubleshooting
 ---------------
 
-- use the `-v` command line option to see details of execution
-- if the execution of the constraint validation is taking a long time, you can use CTRL-C to stop execution halfway:
+- Use the `-v` command line option to see details of execution
+
+- If the execution of the constraint validation is taking a long time, you can use CTRL-C to stop execution halfway:
   the script will exit gracefully printing any violation found up to that point
+
+- To avoid excessive memory usage from large queries, when running Symfony in "debug mode", such as commonly for "dev" envs,
+  add the `--no-debug` option to your commands. If possible, use a non-debug Symfony env.
+
+- If you still get an 'allowed memory size' fatal error, run the commands with `php -d memory_limit=-1`.
 
 FAQ
 ---

@@ -42,7 +42,7 @@ abstract class Validator implements ValidatorInterface
     public function validate($value)
     {
         $context = $this->executionContextFactory->createContext($this);
-        foreach($this->getConstraints() as $name => $constraint) {
+        foreach($this->getConstraints() as $constraint) {
             // allow exiting halfway through the loop
             if (function_exists('pcntl_signal_dispatch')) {
                 pcntl_signal_dispatch();
