@@ -58,13 +58,12 @@ class NameValidator extends FilesystemValidator
                 break;
 
             case ExecutionContextInterface::MODE_DRY_RUN:
-                /// @todo simplify visualization and move this to the constraint itself
                 $this->context->addViolation(new ConstraintViolation($this->getMessage($constraint), null, $constraint));
                 break;
         }
     }
 
-    /// @todo move the error message into the Constraint, as is done by upstream validator
+    /// @todo move the message into the Constraint, as is done by upstream validator
     protected function getMessage($constraint)
     {
         return 'File/dir name does not match regexp: ' . $constraint->matches;

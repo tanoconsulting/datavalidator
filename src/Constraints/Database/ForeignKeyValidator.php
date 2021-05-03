@@ -70,7 +70,7 @@ class ForeignKeyValidator extends DatabaseValidator
         }
     }
 
-    /// @todo improve: return human-readable form instead of json. Also, move the error message into the Constraint, as is done by upstream validator
+    /// @todo improve: return human-readable form instead of json. Also, move the message into the Constraint, as is done by upstream validator
     protected function getMessage(ForeignKey $constraint)
     {
         return preg_replace('/\n */', ' ', json_encode(
