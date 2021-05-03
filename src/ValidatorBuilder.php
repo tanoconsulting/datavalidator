@@ -49,7 +49,7 @@ abstract class ValidatorBuilder
     }
 
     /**
-     * Sets the class metadata factory used by the validator.
+     * Sets the metadata factory used by the validator.
      *
      * @return $this
      */

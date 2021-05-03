@@ -16,6 +16,8 @@ Version 1.0-beta1 (unreleased)
 
 - Fixed: the numeric suffix in the constraint names used for foreign keys now starts correctly at 1
 
+- Improved: the way Foreign Key constraints are described when running validations with `--dry-run`
+
 
 Version 1.0-alpha2
 ==================
