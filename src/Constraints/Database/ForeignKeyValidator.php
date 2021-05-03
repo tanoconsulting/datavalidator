@@ -70,12 +70,28 @@ class ForeignKeyValidator extends DatabaseValidator
         }
     }
 
-    /// @todo improve: return human-readable form instead of json. Also, move the message into the Constraint, as is done by upstream validator
     protected function getMessage(ForeignKey $constraint)
     {
-        return preg_replace('/\n */', ' ', json_encode(
-            ['child' => $constraint->child, 'parent' => $constraint->parent, 'except' => $constraint->except])
-        );
+        $childTable = key($constraint->child);
+        $parentTable = key($constraint->parent);
+        $childCol = current($constraint->child);
+        $parentCol = current($constraint->parent);
+        $exceptions = $constraint->except;
+        $childCols = [];
+        foreach((array)$childCol as $col) {
+            /// @todo allows for $col being a csv
+            $childCols[] = $childTable . '.' . $col;
+        }
+        $parentCols = [];
+        foreach((array)$parentCol as $col) {
+            /// @todo allows for $col being a csv
+            $parentCols[] = $parentTable . '.' . $col;
+        }
+        $out = implode(', ', $childCols) . ' => ' . implode(', ', $parentCols);
+        if ($exceptions != null) {
+            $out .= ' only when: ' . $exceptions;
+        }
+        return $out;
     }
 
     protected function getQuery($constraint, $count = false)
