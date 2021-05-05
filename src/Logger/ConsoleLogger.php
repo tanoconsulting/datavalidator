@@ -164,4 +164,9 @@ final class ConsoleLogger extends AbstractLogger
             'errors' => $this->errors,
         ];
     }
+
+    public function getVerbosity()
+    {
+        return $this->output->getVerbosity();
+    }
 }
