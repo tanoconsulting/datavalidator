@@ -27,7 +27,12 @@ class NameValidator extends FilesystemValidator
                     $violationCount = 0;
                     $finder = $this->getFinder($constraint);
                     foreach ($finder->in($value) as $file) {
-                        // no need to quote the regexp - double colons are not valid in filenames
+                        /// @todo review: do we need to escape the delimiter char ':', and is it a good choice ?
+                        ///       - we don't want to use preg_quote, to allow users to specify regexps
+                        ///       - ideally, we would pick as delimiter a char which is not valid in filenames, but in unix only NUL and / are
+                        ///       - double colons are not valid in windows filenames, but they are valid in unix
+                        ///       - also, double colons are special chars for regexps
+                        ///       => move to '/' as delimiter, and escape it if found ?
                         if (!preg_match(':' . $constraint->matches . ':', $file->getBasename())) {
                             $violationCount++;
                         }
@@ -45,6 +50,7 @@ class NameValidator extends FilesystemValidator
                     $violations = [];
                     $finder = $this->getFinder($constraint);
                     foreach ($finder->in($value) as $file) {
+                        /// @todo see discussion above
                         if (!preg_match(':' . $constraint->matches . ':', $file->getBasename())) {
                             $violations[] = $file->getPathname();
                         }
