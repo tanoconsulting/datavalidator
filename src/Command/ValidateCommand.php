@@ -147,6 +147,14 @@ abstract class ValidateCommand extends Command
                 }
                 break;
 
+            case ExecutionContext::MODE_COUNT:
+                $rows = [['Constraint', 'Violations', 'Details']];
+                // we expect the violation value to always be an integer
+                foreach($violations as $violation) {
+                    $rows[] = [$violation->getConstraint()->getName(), $violation->getInvalidValue(), $violation->getMessage()];
+                }
+                break;
+
             case ExecutionContext::MODE_FETCH:
                 /// @todo improve output: display as well the violation message ?
 
@@ -162,14 +170,6 @@ abstract class ValidateCommand extends Command
                     } else {
                         $rows[] = [$violation->getConstraint()->getName(), 1, $this->toString($data)];
                     }
-                }
-                break;
-
-            case ExecutionContext::MODE_COUNT:
-                $rows = [['Constraint', 'Violations', 'Details']];
-                // we expect the violation value to always be an integer
-                foreach($violations as $violation) {
-                    $rows[] = [$violation->getConstraint()->getName(), $violation->getInvalidValue(), $violation->getMessage()];
                 }
                 break;
 
